@@ -1,0 +1,97 @@
+.dest-page {
+  min-height: 70vh;
+}
+
+.dest-controls {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 20px;
+}
+
+.dest-controls input {
+  width: min(380px, 100%);
+  padding: 12px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.dest-count {
+  margin: 0 0 24px;
+  opacity: 0.7;
+}
+
+.dest-empty {
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* One card per destination */
+.dest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.dest-grid .dcard {
+  width: 100%;
+  min-width: 0;
+  flex: none;
+  display: block;
+}
+
+.dest-badge {
+  display: inline-block;
+  margin-top: 8px;
+  font-style: normal;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rg
+  ba(0, 0, 0, 0.07);
+}
+.destinations-page {
+  min-height: 100vh;
+  padding: 80px 20px;
+}
+
+.destinations-page .wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.destination-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(280px, 1fr)
+  );
+  gap: 24px;
+}
+
+.destination-card {
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.destination-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.destination-card-content {
+  padding: 20px;
+}
+
+.destination-card-content h3 {
+  margin: 0 0 10px;
+}
+
+.destination-card-content p {
+  margin: 0;
+  line-height: 1.6;
+}
