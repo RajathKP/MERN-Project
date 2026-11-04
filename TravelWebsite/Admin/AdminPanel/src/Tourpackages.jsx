@@ -8,6 +8,7 @@ const API = "create new api for adding tour packages";
 const initialForm = {
   title: "",
   city: "",
+  district: "",
   region: "",
   type: "",
   days: "",
@@ -33,8 +34,8 @@ const Tourpackages = () => {
     e.preventDefault();
     setError("");
 
-    if (!form.title.trim() || !form.city.trim() || !form.region.trim()) {
-      setError("Title, city and region are required");
+    if (!form.title.trim() || !form.city.trim() || !form.district.trim() || !form.region.trim()) {
+      setError("Title, city, district and region are required");
       return;
     }
 
@@ -42,6 +43,7 @@ const Tourpackages = () => {
       ...form,
       title: form.title.trim(),
       city: form.city.trim(),
+      district: form.district.trim(),
       region: form.region.trim(),
       type: form.type.trim(),
       image: form.image.trim(),
@@ -85,117 +87,53 @@ const Tourpackages = () => {
 
         {error && <div className="error-message">{error}</div>}
 
-        <label>
-          Title *
-          <input
-            type="text"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            placeholder="e.g. Magical Munnar Escape"
-          />
-        </label>
+       <div className="form-row">
+  <label>
+    City *
+    <input
+      type="text"
+      name="city"
+      value={form.city}
+      onChange={handleFormChange}
+      placeholder="e.g. Munnar"
+    />
+  </label>
 
-        <div className="form-row">
-          <label>
-            City *
-            <input
-              type="text"
-              name="city"
-              value={form.city}
-              onChange={handleChange}
-              placeholder="e.g. Munnar"
-            />
-          </label>
+  <label>
+    District *
+    <input
+      type="text"
+      name="district"
+      value={form.district}
+      onChange={handleFormChange}
+      placeholder="e.g. Idukki"
+    />
+  </label>
+</div>
 
-          <label>
-            Region *
-            <input
-              type="text"
-              name="region"
-              value={form.region}
-              onChange={handleChange}
-              placeholder="e.g. Kerala"
-            />
-          </label>
-        </div>
+<div className="form-row">
+  <label>
+    Region *
+    <input
+      type="text"
+      name="region"
+      value={form.region}
+      onChange={handleFormChange}
+      placeholder="e.g. Kerala"
+    />
+  </label>
 
-        <div className="form-row">
-          <label>
-            Type
-            <input
-              type="text"
-              name="type"
-              value={form.type}
-              onChange={handleChange}
-              placeholder="e.g. Adventure, Beach, Cultural"
-            />
-          </label>
-
-          <label>
-            Days
-            <input
-              type="number"
-              min="1"
-              name="days"
-              value={form.days}
-              onChange={handleChange}
-            />
-          </label>
-        </div>
-
-        <div className="form-row">
-          <label>
-            Price ($)
-            <input
-              type="number"
-              min="0"
-              name="price"
-              value={form.price}
-              onChange={handleChange}
-            />
-          </label>
-
-          <label>
-            Rating (0–5)
-            <input
-              type="number"
-              min="0"
-              max="5"
-              step="0.1"
-              name="rating"
-              value={form.rating}
-              onChange={handleChange}
-            />
-          </label>
-        </div>
-
-        <label>
-          Image URL
-          <input
-            type="text"
-            name="image"
-            value={form.image}
-            onChange={handleChange}
-            placeholder="https://..."
-          />
-        </label>
-
-        {form.image && (
-          <img src={form.image} alt="Preview" className="image-preview" />
-        )}
-
-        <label>
-          Description
-          <textarea
-            name="description"
-            rows="4"
-            value={form.description}
-            onChange={handleChange}
-            placeholder="Short description of the tour"
-          />
-        </label>
-
+  <label>
+    Type
+    <input
+      type="text"
+      name="type"
+      value={form.type}
+      onChange={handleFormChange}
+      placeholder="e.g. Adventure, Beach, Cultural"
+    />
+  </label>
+</div>
         <div className="form-actions">
           <button
             type="button"

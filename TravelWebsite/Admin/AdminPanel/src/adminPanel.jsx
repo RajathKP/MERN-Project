@@ -607,6 +607,23 @@ const AdminDashboard = () => {
                 />
               </label>
 
+
+
+               <label>
+                District *
+                <input
+                  type="text"
+                  name="district"
+                  value={form.district}
+                  onChange={handleFormChange}
+                  placeholder="e.g. Calicut"
+                />
+              </label>
+
+
+
+
+
               <label>
                 Region *
                 <input

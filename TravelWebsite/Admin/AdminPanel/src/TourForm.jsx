@@ -9,6 +9,7 @@ const API = "http://localhost:5000/api/tours";
 const emptyForm = {
   title: "",
   city: "",
+  district: "",
   region: "",
   type: "",
   days: "",
@@ -87,23 +88,29 @@ const AdminDashboard = () => {
 
     setForm({
       title: tour.title || "",
-      city: tour.city || "",
+      city: tour.city || "", 
       region: tour.region || "",
       type: tour.type || "",
+      district: tour.district || "",
       days: tour.days ?? "",
       price: tour.price ?? "",
       rating: tour.rating ?? "",
-      image: tour.image || "",
-      description: tour.description || "",
+      image: tour.image || "",   
+      description: tour.description || "", 
     });
   }, [editingId, tours]);
 
   // SEARCH TOURS
+  
+
+
   const filteredTours = tours.filter((tour) =>
-    `${tour.title || ""} ${tour.city || ""} ${tour.region || ""} ${tour.type || ""}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  `${tour.title || ""} ${tour.city || ""} ${tour.district || ""} ${
+    tour.region || ""
+  } ${tour.type || ""}`
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);
 
   // FORM HELPERS
   const handleFormChange = (e) => {
@@ -135,8 +142,8 @@ const AdminDashboard = () => {
     e.preventDefault();
     setFormError("");
 
-    if (!form.title.trim() || !form.city.trim() || !form.region.trim()) {
-      setFormError("Title, city and region are required");
+    if (!form.title.trim() || !form.city.trim() || !form.district.trim() || !form.region.trim()) {
+      setFormError("Title, city, district and region are required");
       return;
     }
 
@@ -144,6 +151,7 @@ const AdminDashboard = () => {
       title: form.title.trim(),
       city: form.city.trim(),
       region: form.region.trim(),
+      district: form.district.trim(),
       type: form.type.trim(),
       image: form.image.trim(),
       description: form.description.trim(),
@@ -359,6 +367,7 @@ const AdminDashboard = () => {
                         <th>Image</th>
                         <th>Tour</th>
                         <th>City</th>
+                        <th>District</th>
                         <th>Region</th>
                         <th>Type</th>
                         <th>Days</th>
@@ -529,7 +538,17 @@ const AdminDashboard = () => {
                   placeholder="e.g. Munnar"
                 />
               </label>
+            <label>
+                District *
+                <input
+                  type="text"
+                  name="district"
+                  value={form.district}
+                  onChange={handleFormChange}
+                  placeholder="e.g.Calicut"
+                />
 
+              </label>
               <label>
                 Region *
                 <input

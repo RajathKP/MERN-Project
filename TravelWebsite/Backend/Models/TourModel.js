@@ -82,6 +82,11 @@ const tourSchema = new mongoose.Schema(
       default: ""
     },
 
+    district: {
+      type: String,
+      default: ""
+    },
+
     month: {
       type: String,
       default: ""
