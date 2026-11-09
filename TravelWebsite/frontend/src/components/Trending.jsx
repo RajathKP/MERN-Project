@@ -1,13 +1,16 @@
-
+import { useNavigate } from 'react-router-dom'
 import Scene from './Scene.jsx'
 import { SectionTitle, Stars, ClockIcon, money } from './common.jsx'
 
 export default function Trending({
   tours,
   filtered,
-  onClear,
-  onBook
+  onClear
 }) {
+  const navigate = useNavigate()
+
+  // Open the tour details page
+  const openTour = t => navigate(`/tours/${t._id || t.id}`)
 
   return (
     <section className="section" id="tours">
@@ -51,10 +54,10 @@ export default function Trending({
             <article
               className="tcard"
               key={t._id || t.id}
-              onClick={() => onBook(t)}
+              onClick={() => openTour(t)}
               tabIndex={0}
               onKeyDown={e =>
-                e.key === 'Enter' && onBook(t)
+                e.key === 'Enter' && openTour(t)
               }
             >
 
@@ -87,9 +90,9 @@ export default function Trending({
                       From
                     </small>
 
-                    {t.was > t.price && (
+                    {(t.oldPrice || t.was) > t.price && (
                       <s>
-                        {money(t.was)}
+                        {money(t.oldPrice || t.was)}
                       </s>
                     )}
 

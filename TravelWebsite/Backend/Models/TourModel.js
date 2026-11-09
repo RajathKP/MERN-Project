@@ -95,7 +95,31 @@ const tourSchema = new mongoose.Schema(
     duration: {
       type: String,
       default: ""
-    }
+    },
+
+    included: {
+      flight: Boolean,
+      transfers: Boolean,
+      meals: Boolean,
+      activities: Boolean,
+    },
+
+    hotelStars: Number,
+
+    oldPrice: Number,
+
+    activities: [String],
+
+    inclusions: [String],
+
+    exclusions: [String],
+
+    itinerary: [
+      {
+        title: String,
+        description: String,
+      },
+    ],
   },
   {
     timestamps: true

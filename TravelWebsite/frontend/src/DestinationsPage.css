@@ -48,7 +48,7 @@
   font-size: 0.75rem;
   padding: 3px 10px;
   border-radius: 999px;
-  background: rg
+  background: rgba(0, 0, 0, 0.1)
   ba(0, 0, 0, 0.07);
 }
 .destinations-page {

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
 
 
-const API = "create new api for adding tour packages";
+
 
 const initialForm = {
   title: "",

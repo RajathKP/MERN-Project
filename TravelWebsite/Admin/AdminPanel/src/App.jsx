@@ -10,6 +10,9 @@ import {
 
 import AdminDashboard from "./adminPanel.jsx";
 import Destinations from "./DestnationsAdmin.jsx";
+import TourDetails from "../../../frontend/src/components/Tourdetails.jsx";
+
+   
 
 const NotFound = () => (
   <div style={{ padding: "3rem", textAlign: "center" }}>
@@ -36,7 +39,7 @@ const App = () => {
           path="/admin"
           element={<AdminDashboard />}
         />
-
+   <Route path="/tours/:id" element={<TourDetails />} />
         {/* Tour Packages */}
         <Route
           path="/admin/tours"

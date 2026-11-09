@@ -186,10 +186,12 @@ export default function DestinationsPage() {
 
                     <div className="dcard-cap">
                       <b>{d.name}</b>
+                      <b>{d.district}</b>
                       <span>{d.sub}</span>
 
                       <em className="dest-badge">
                         {d.region}
+                        {}
                         {d.tours > 1 && ` · ${d.tours} tours`}
                       </em>
                     </div>

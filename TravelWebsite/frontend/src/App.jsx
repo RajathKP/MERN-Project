@@ -1,9 +1,8 @@
-
 import { useEffect, useMemo, useState } from "react";
-import Destinations from "./components/Destinations.jsx";
+
 import DestinationsPage from "./DestinationsPage.jsx";
-
-
+import TourDetails from "./components/Tourdetails.jsx";
+import Places from "./components/Places.jsx";
 import {
   BrowserRouter,
   Routes,
@@ -40,8 +39,6 @@ const EMPTY = {
 
 function MainApp() {
 
- 
-
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
@@ -58,7 +55,6 @@ function MainApp() {
   const [tours, setTours] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
 
 
   // ==================================================
@@ -83,8 +79,6 @@ function MainApp() {
         }
 
         const data = await response.json();
-
-        console.log("Tours received:", data);
 
         const tourData = Array.isArray(data)
           ? data
@@ -155,7 +149,6 @@ function MainApp() {
         return false;
       }
 
-
       // TYPE
       if (
         filters.type &&
@@ -163,7 +156,6 @@ function MainApp() {
       ) {
         return false;
       }
-
 
       // MONTH
       if (filters.month) {
@@ -180,7 +172,6 @@ function MainApp() {
         }
 
       }
-
 
       // DURATION
       if (d) {
@@ -295,7 +286,7 @@ function MainApp() {
       )}
 
 
-      {/* TRENDING */}
+      {/* TRENDING (cards open /tours/:id) */}
 
       {!loading &&
         !error && (
@@ -306,23 +297,19 @@ function MainApp() {
             onClear={() =>
               setFilters(EMPTY)
             }
-            onBook={setTour}
           />
 
         )}
 
 
       {/* DESTINATIONS */}
+{/* 
+     <Destinations onPick={pick} /> */}
 
-      <Destinations
-        onPick={pick}
-      />
-
-
-      {/* POPULAR */}
+<Places />
+      {/* POPULAR (cards open /tours/:id) */}
 
       <Popular
-        onBook={setTour}
         onPick={pick}
       />
 
@@ -406,25 +393,33 @@ function MainApp() {
 
 export default function App() {
 
-
   return (
 
     <BrowserRouter>
 
       <Routes>
 
-         {/* DESTINATIONS */}
-
-<Route
-  path="/destinations"
-  element={<DestinationsPage />}
-/>
-
         {/* HOME */}
 
         <Route
           path="/"
           element={<MainApp />}
+        />
+
+
+        {/* TOUR DETAILS */}
+
+        <Route
+          path="/tours/:id"
+          element={<TourDetails />}
+        />
+
+
+        {/* DESTINATIONS */}
+
+        <Route
+          path="/destinations"
+          element={<DestinationsPage />}
         />
 
 

@@ -1,66 +1,62 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Scene from "./Scene.jsx";
+import { Carousel, Stars, ClockIcon, money } from "./common.jsx";
+import { OurDestinations } from "./Destinations.jsx";
 
-import { useEffect, useState } from 'react'
-import Scene from './Scene.jsx'
-import { Carousel, Stars, ClockIcon, money } from './common.jsx'
-import { OurDestinations } from './Destinations.jsx'
+const API = "http://localhost:5000/api/tours";
 
-const API = "http://localhost:5000/api/tours"
+export default function Popular({ onPick }) {
+  const navigate = useNavigate();
 
-export default function Popular({ onBook, onPick }) {
+  const [tours, setTours] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [tours, setTours] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  // Open the tour details page
+  const openTour = (tour) => navigate(`/tours/${tour._id || tour.id}`);
 
+  // FETCH TOURS FROM MONGODB API
   useEffect(() => {
-
     const fetchTours = async () => {
-
       try {
-        setLoading(true)
-        setError('')
+        setLoading(true);
+        setError("");
 
-        const response = await fetch(API)
+        const response = await fetch(API);
 
         if (!response.ok) {
-          throw new Error(`HTTP error: ${response.status}`)
+          throw new Error(`HTTP error: ${response.status}`);
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
         const tourData = Array.isArray(data)
           ? data
-          : data.tours || []
+          : data.tours || [];
 
-        setTours(tourData)
-
+        setTours(tourData);
       } catch (err) {
-
-        console.error("Failed to fetch popular tours:", err)
-        setError("Unable to load popular tours.")
-
+        console.error("Failed to fetch popular tours:", err);
+        setError("Unable to load popular tours.");
       } finally {
-
-        setLoading(false)
-
+        setLoading(false);
       }
-    }
+    };
 
-    fetchTours()
+    fetchTours();
+  }, []);
 
-  }, [])
-
-
-  // Popular tours = tours with 5 or more reviews
-  const list = tours.filter(
-    tour => Number(tour.reviews || 0) >= 5
-  )
-
+  // POPULAR TOURS
+  // Tours with rating 4 or higher
+  const list = tours
+    .filter((tour) => Number(tour.rating || 0) >= 4)
+    .slice(0, 8);
 
   return (
     <>
+      {/* ================= POPULAR TOURS ================= */}
       <section className="popular" id="popular">
-
         <Scene
           kind="italy"
           className="pop-bg"
@@ -69,9 +65,7 @@ export default function Popular({ onBook, onPick }) {
         <div className="pop-shade" />
 
         <div className="wrap pop-in">
-
           <div className="pop-head">
-
             <h2>
               Popular Tours
 
@@ -89,121 +83,115 @@ export default function Popular({ onBook, onPick }) {
                   strokeLinejoin="round"
                 />
               </svg>
-
             </h2>
 
             <a
               href="#tours"
-              onClick={() => onPick('')}
+              onClick={() => onPick("")}
               className="all-tours"
             >
               <u>ALL TOURS</u>
             </a>
-
           </div>
 
-
-          {/* Loading */}
+          {/* LOADING */}
           {loading && (
             <p className="loading">
               Loading popular tours...
             </p>
           )}
 
-
-          {/* Error */}
+          {/* ERROR */}
           {error && (
             <p className="error">
               {error}
             </p>
           )}
 
+          {/* POPULAR TOURS */}
+          {!loading && !error && list.length > 0 && (
+            <Carousel
+              className="pop-car"
+              items={list.map((tour) => ({
+                ...tour,
+                id: tour._id || tour.id,
+              }))}
+              render={(t) => {
+                const was = Number(t.oldPrice || t.was) || 0;
+                const hasDiscount = was > Number(t.price);
 
-          {/* Popular Tours */}
-          {!loading &&
-            !error &&
-            list.length > 0 && (
-
-              <Carousel
-                className="pop-car"
-                items={list.map(tour => ({
-                  ...tour,
-                  id: tour._id || tour.id
-                }))}
-
-                render={t => (
-
+                return (
                   <article
                     className="pcard"
-                    onClick={() => onBook(t)}
+                    onClick={() => openTour(t)}
                     tabIndex={0}
-                    onKeyDown={e =>
-                      e.key === 'Enter' && onBook(t)
-                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        openTour(t);
+                      }
+                    }}
                   >
-
+                    {/* IMAGE */}
                     <div className="pcard-img">
-
                       <Scene
-                        kind={t.scene}
+                        kind={t.scene || "default"}
                         image={t.image}
                         alt={t.title}
                       />
 
-                      {t.was > t.price && (
+                      {/* DISCOUNT */}
+                      {hasDiscount && (
                         <span className="tag">
                           {Math.round(
-                            (1 - t.price / t.was) * 100
-                          )}% Off
+                            (1 - Number(t.price) / was) * 100
+                          )}
+                          % Off
                         </span>
                       )}
-
                     </div>
 
-
+                    {/* BODY */}
                     <div className="pcard-body">
-
-                      <h3>
-                        {t.title}
-                      </h3>
+                      <h3>{t.title}</h3>
 
                       <p>
-                        {t.description || ''}
+                        {t.description || "Explore this amazing destination with TravelU."}
                       </p>
 
+                      {/* LOCATION */}
+                      <small className="tour-location">
+                        {t.city}
+                        {t.district ? `, ${t.district}` : ""}
+                        {t.region ? `, ${t.region}` : ""}
+                      </small>
                     </div>
 
-
+                    {/* FOOTER */}
                     <div className="pcard-foot">
-
                       <div>
-
+                        {/* DURATION */}
                         <span className="dur">
                           <ClockIcon />
-                          {t.days} Days
+                          {t.days || 1} Days
                         </span>
 
+                        {/* RATING */}
                         <div className="rv">
-
                           <Stars
                             n={Number(t.rating || 0)}
                           />
 
                           <small>
-                            ({Number(t.reviews || 0)} Review
-                            {Number(t.reviews || 0) !== 1 ? 's' : ''})
+                            {Number(t.rating || 0).toFixed(1)}
                           </small>
-
                         </div>
-
                       </div>
 
-
+                      {/* PRICE */}
                       <div className="price">
-
-                        {t.was > t.price ? (
+                        {hasDiscount ? (
                           <s>
-                            {money(t.was)}
+                            {money(was)}
                           </s>
                         ) : (
                           <small>
@@ -212,45 +200,33 @@ export default function Popular({ onBook, onPick }) {
                         )}
 
                         <b>
-                          {money(t.price)}
+                          {money(Number(t.price) || 0)}
                         </b>
-
                       </div>
-
                     </div>
-
                   </article>
+                );
+              }}
+            />
+          )}
 
-                )}
-              />
-
-            )}
-
-
-          {/* No popular tours */}
+          {/* NO TOURS */}
           {!loading &&
             !error &&
             list.length === 0 && (
-
               <p>
                 No popular tours available.
               </p>
-
             )}
-
         </div>
-
       </section>
 
-
+      {/* ================= DESTINATIONS ================= */}
       <section className="section">
-
         <OurDestinations
           onPick={onPick}
         />
-
       </section>
-
     </>
-  )
+  );
 }
