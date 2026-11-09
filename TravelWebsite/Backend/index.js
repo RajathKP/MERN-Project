@@ -5,15 +5,15 @@ dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const express = require("express");
 const cors = require("cors");
-const bookingRoutes = require("./Routes/BookingRoute");
-const connectDB = require("./config/db");
-const taxiBookingRoutes = require("./Routes/TaxiBooking");
-const tourRoutes = require("./routes/tourRoutes");
-const destinationRoute = require("./Routes/destinationRoute");
 
+const connectDB = require("./config/db");
+
+const tourRoutes = require("./routes/tourRoutes");
+const bookingRoutes = require("./Routes/BookingRoute");
+const destinationRoute = require("./Routes/destinationRoute");
+const taxiBookingRoutes = require("./Routes/TaxiBooking");
 
 const app = express();
-
 
 
 // =====================================
@@ -26,6 +26,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
     ],
+    credentials: true,
   })
 );
 
@@ -49,7 +50,19 @@ app.get("/travelu-test-2026", (req, res) => {
   res.send("TRAVELU BACKEND 2026 - CORRECT SERVER");
 });
 
+///
 
+
+app.get("/taxi-direct-test", (req, res) => {
+  res.json({
+    success: true,
+    message: "THIS IS THE CORRECT TRAVELU SERVER"
+  });
+});
+
+
+
+///
 // =====================================
 // API ROUTES
 // =====================================
@@ -59,11 +72,19 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/destinations", destinationRoute);
 app.use("/api/taxi-bookings", taxiBookingRoutes);
 
+
 // =====================================
-// LOG
+// ROUTE LOG
 // =====================================
 
-console.log("Destination route mounted at /api/destinations");
+console.log("=================================");
+console.log("TravelU API routes mounted");
+console.log("=================================");
+console.log("Tours:          /api/tours");
+console.log("Bookings:       /api/bookings");
+console.log("Destinations:   /api/destinations");
+console.log("Taxi Bookings:  /api/taxi-bookings");
+console.log("=================================");
 
 
 // =====================================
@@ -78,9 +99,6 @@ const startServer = async () => {
       console.log("=================================");
       console.log("TravelU server running on port 5000");
       console.log("=================================");
-      console.log("Tours:        /api/tours");
-      console.log("Bookings:     /api/bookings");
-      console.log("Destinations: /api/destinations");
     });
 
   } catch (error) {

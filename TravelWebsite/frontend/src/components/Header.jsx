@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -75,6 +74,7 @@ const LINKS = [
   ["Home", "/"],
   ["Destinations", "/destinations"],
   ["Listings", "/#tours"],
+  ["Taxi Booking", "/taxi"],
   ["Popular", "/#popular"],
   ["Contact", "/#contact"]
 ];

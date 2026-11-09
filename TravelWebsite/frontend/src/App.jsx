@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import DestinationsPage from "./DestinationsPage.jsx";
 import TourDetails from "./components/Tourdetails.jsx";
+import TaxiBooking from "./components/TaxiBooking.jsx";
 import Places from "./components/Places.jsx";
 import {
   BrowserRouter,
@@ -253,6 +254,9 @@ function MainApp() {
         onSignIn={() =>
           navigate("/login")
         }
+        onTaxi={() =>
+          navigate("/taxi")
+        }
       />
 
 
@@ -412,6 +416,14 @@ export default function App() {
         <Route
           path="/tours/:id"
           element={<TourDetails />}
+        />
+
+
+        {/* TAXI BOOKING */}
+
+        <Route
+          path="/taxi"
+          element={<TaxiBooking />}
         />
 
 

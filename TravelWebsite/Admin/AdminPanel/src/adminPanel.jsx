@@ -6,7 +6,7 @@ import "./TourForm.css";
 
 const API = "http://localhost:5000/api/tours";
 const DEST_API = "http://localhost:5000/api/destinations";
-const BOOKINGS_API = "http://localhost:5000/api/bookings";
+const TAXI_BOOKINGS_API = "http://localhost:5000/api/taxi-bookings";
 
 const BOOKING_STATUSES = ["pending", "confirmed", "cancelled"];
 
@@ -96,6 +96,18 @@ const ToursTable = ({ tours, onView, onEdit, onDelete }) => {
   const showActions = Boolean(onView || onEdit || onDelete);
   const columns = showActions ? 9 : 8;
 
+///
+
+
+
+
+
+
+
+
+
+
+  ///
   return (
     <div className="table-container">
       <table>
@@ -368,24 +380,46 @@ const AdminDashboard = () => {
   };
 
   /* ---------- Data: taxi bookings ---------- */
-  const fetchTaxiBookings = async () => {
-    try {
-      setTaxiLoading(true);
-      setTaxiError("");
 
-      const response = await fetch(TAXI_API);
-      if (!response.ok) throw new Error("Unable to fetch taxi bookings");
+  
 
-      const data = await response.json();
-      if (!Array.isArray(data)) throw new Error("Invalid response from backend");
+const fetchTaxiBookings = async () => {
+  try {
+    setTaxiLoading(true);
+    setTaxiError("");
 
-      setTaxiBookings(data);
-    } catch (err) {
-      setTaxiError(err.message);
-    } finally {
-      setTaxiLoading(false);
+    console.log("Fetching taxi bookings:", TAXI_BOOKINGS_API);
+
+    const response = await fetch(TAXI_BOOKINGS_API);
+
+    console.log("Taxi response status:", response.status);
+    console.log("Taxi response URL:", response.url);
+
+    const data = await parseResponse(response);
+
+    console.log("Taxi bookings received:", data);
+
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+          `Server returned an unexpected response (status ${response.status})`
+      );
     }
-  };
+
+    if (!Array.isArray(data)) {
+      throw new Error("Invalid response from backend");
+    }
+
+    setTaxiBookings(data);
+  } catch (err) {
+    console.error("Fetch taxi bookings error:", err);
+    setTaxiError(err.message);
+  } finally {
+    setTaxiLoading(false);
+  }
+};
+
+
 
   useEffect(() => {
     fetchTours();
@@ -457,13 +491,13 @@ const AdminDashboard = () => {
       .includes(search.toLowerCase())
   );
 
-  const filteredTaxiBookings = taxiBookings.filter((taxi) =>
-    `${taxi.name || ""} ${taxi.email || ""} ${taxi.phone || ""} ${
-      taxi.pickupLocation || ""
-    } ${taxi.dropLocation || ""} ${taxi.vehicleType || ""} ${taxi.status || ""}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+const filteredTaxiBookings = taxiBookings.filter((taxi) =>
+  `${taxi.name || ""} ${taxi.email || ""} ${taxi.phone || ""} ${
+    taxi.pickup || ""
+  } ${taxi.dropoff || ""} ${taxi.vehicle || ""} ${taxi.status || ""}`
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);
 
   const viewedTour = tours.find((tour) => tour._id === viewingId);
 
@@ -734,27 +768,36 @@ const AdminDashboard = () => {
 
   /* ---------- Update / delete: taxi bookings ---------- */
   const updateTaxiStatus = async (id, status) => {
-    try {
-      const response = await fetch(`${TAXI_API}/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
+  try {
+    const response = await fetch(`${TAXI_API}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    });
 
-      const data = await parseResponse(response);
+    const data = await parseResponse(response);
 
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to update taxi booking");
-      }
-
-      setTaxiBookings((previous) =>
-        previous.map((t) => (t._id === id ? { ...t, status } : t))
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Failed to update taxi booking"
       );
-      showSuccess("Taxi booking status updated");
-    } catch (err) {
-      alert(err.message);
     }
-  };
+
+    setTaxiBookings((previous) =>
+      previous.map((t) =>
+        t._id === id
+          ? { ...t, status: data.booking?.status || status }
+          : t
+      )
+    );
+
+    showSuccess("Taxi booking status updated");
+  } catch (err) {
+    alert(err.message);
+  }
+};
 
   const deleteTaxiBooking = async (id) => {
     if (!window.confirm("Are you sure you want to delete this taxi booking?"))
@@ -1212,140 +1255,151 @@ const AdminDashboard = () => {
         )}
 
         {/* ================= TAXI BOOKINGS ================= */}
-        {activeTab === "taxi" && (
-          <div className="tour-section">
-            <SectionHeader
-              title="Taxi Bookings"
-              subtitle="Taxi rides booked by customers"
-              search={search}
-              onSearch={setSearch}
-              placeholder="Search taxi bookings..."
-            />
+       {/* ================= TAXI BOOKINGS ================= */}
+{activeTab === "taxi" && (
+  <div className="tour-section">
+    <SectionHeader
+      title="Taxi Bookings"
+      subtitle="Taxi rides booked by customers"
+      search={search}
+      onSearch={setSearch}
+      placeholder="Search taxi bookings..."
+    />
 
-            {taxiLoading && <p>Loading taxi bookings...</p>}
+    {taxiLoading && <p>Loading taxi bookings...</p>}
 
-            {taxiError && (
-              <div className="error-message">
-                {taxiError}
-                <button onClick={fetchTaxiBookings}>Retry</button>
-              </div>
+    {taxiError && (
+      <div className="error-message">
+        {taxiError}
+        <button onClick={fetchTaxiBookings}>Retry</button>
+      </div>
+    )}
+
+    {!taxiLoading && !taxiError && (
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Booked on</th>
+              <th>Customer</th>
+              <th>Route</th>
+              <th>Pickup Date & Time</th>
+              <th>Vehicle</th>
+              <th>Passengers</th>
+              <th>Message</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredTaxiBookings.length === 0 ? (
+              <tr>
+                <td colSpan="9">No taxi bookings found</td>
+              </tr>
+            ) : (
+              filteredTaxiBookings.map((taxi) => {
+                const status = taxi.status || "Pending";
+
+                return (
+                  <tr key={taxi._id}>
+                    {/* Booked on */}
+                    <td>
+                      {taxi.createdAt
+                        ? new Date(taxi.createdAt).toLocaleDateString()
+                        : "-"}
+                    </td>
+
+                    {/* Customer */}
+                    <td>
+                      <strong>{taxi.name || "-"}</strong>
+                      <br />
+
+                      {taxi.phone || "-"}
+                      <br />
+
+                      {taxi.email || "-"}
+                    </td>
+
+                    {/* Route */}
+                    <td>
+                      <strong>{taxi.pickup || "-"}</strong>
+                      <br />
+                      → {taxi.dropoff || "-"}
+                    </td>
+
+                    {/* Date & time */}
+                    <td>
+                      {taxi.date || "-"}
+                      <br />
+                      {taxi.time || "-"}
+                    </td>
+
+                    {/* Vehicle */}
+                    <td>
+                      <span className="type-badge">
+                        {taxi.vehicle || "-"}
+                      </span>
+                    </td>
+
+                    {/* Passengers */}
+                    <td>{taxi.passengers || 1}</td>
+
+                    {/* Message */}
+                    <td>
+                      {taxi.message ? taxi.message : "-"}
+                    </td>
+
+                    {/* Status */}
+                    <td>
+                      <select
+                        value={status.toLowerCase()}
+                        onChange={(e) =>
+                          updateTaxiStatus(
+                            taxi._id,
+                            e.target.value
+                          )
+                        }
+                        style={{
+                          ...(STATUS_COLORS[
+                            status.toLowerCase()
+                          ] || STATUS_COLORS.pending),
+                          border: "none",
+                          borderRadius: "999px",
+                          padding: "0.3rem 0.7rem",
+                          fontWeight: 600,
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {TAXI_STATUSES.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="package-buttons">
+                      <button
+                        className="delete-btn"
+                        onClick={() =>
+                          deleteTaxiBooking(taxi._id)
+                        }
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
-
-            {!taxiLoading && !taxiError && (
-              <div className="table-container">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Booked on</th>
-                      <th>Customer</th>
-                      <th>Route</th>
-                      <th>Pickup date &amp; time</th>
-                      <th>Vehicle</th>
-                      <th>Passengers</th>
-                      <th>Fare</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {filteredTaxiBookings.length === 0 ? (
-                      <tr>
-                        <td colSpan="9">No taxi bookings found</td>
-                      </tr>
-                    ) : (
-                      filteredTaxiBookings.map((taxi) => {
-                        const status = taxi.status || "pending";
-
-                        return (
-                          <tr key={taxi._id}>
-                            <td>
-                              {taxi.createdAt
-                                ? new Date(taxi.createdAt).toLocaleDateString()
-                                : "-"}
-                            </td>
-                            <td>
-                              <strong>{taxi.name}</strong>
-                              <br />
-                              {taxi.phone}
-                              {taxi.email && (
-                                <>
-                                  <br />
-                                  {taxi.email}
-                                </>
-                              )}
-                            </td>
-                            <td>
-                              <strong>{taxi.pickupLocation}</strong>
-                              <br />→ {taxi.dropLocation}
-                              {taxi.tripType && (
-                                <>
-                                  <br />
-                                  <small style={{ textTransform: "capitalize" }}>
-                                    {taxi.tripType}
-                                  </small>
-                                </>
-                              )}
-                            </td>
-                            <td>
-                              {taxi.pickupDate
-                                ? new Date(taxi.pickupDate).toLocaleDateString()
-                                : "-"}
-                              {taxi.pickupTime && (
-                                <>
-                                  <br />
-                                  {taxi.pickupTime}
-                                </>
-                              )}
-                            </td>
-                            <td>
-                              <span className="type-badge">
-                                {taxi.vehicleType}
-                              </span>
-                            </td>
-                            <td>{taxi.passengers}</td>
-                            <td>{taxi.fare ? `$${taxi.fare}` : "-"}</td>
-                            <td>
-                              <select
-                                value={status}
-                                onChange={(e) =>
-                                  updateTaxiStatus(taxi._id, e.target.value)
-                                }
-                                style={{
-                                  ...STATUS_COLORS[status],
-                                  border: "none",
-                                  borderRadius: "999px",
-                                  padding: "0.3rem 0.7rem",
-                                  fontWeight: 600,
-                                  textTransform: "capitalize",
-                                }}
-                              >
-                                {TAXI_STATUSES.map((s) => (
-                                  <option key={s} value={s}>
-                                    {s}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-                            <td className="package-buttons">
-                              <button
-                                className="delete-btn"
-                                onClick={() => deleteTaxiBooking(taxi._id)}
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+)}
         {/* ================= VIEW TOUR ================= */}
         {activeTab === "view" && (
           <div className="tour-section">
