@@ -4,9 +4,12 @@ import { useSearchParams } from "react-router-dom";
 import "./AdminDashboard.css";
 import "./TourForm.css";
 
-const API = "http://localhost:5000/api/tours";
-const DEST_API = "http://localhost:5000/api/destinations";
-const TAXI_BOOKINGS_API = "http://localhost:5000/api/taxi-bookings";
+const API_BASE = "http://localhost:5000";
+const API = `${API_BASE}/api/tours`;
+const DEST_API = `${API_BASE}/api/destinations`;
+const CATEGORY_API = `${API_BASE}/api/categories`;
+const BOOKINGS_API = `${API_BASE}/api/bookings`;
+const TAXI_BOOKINGS_API = `${API_BASE}/api/taxi-bookings`;
 
 const BOOKING_STATUSES = ["pending", "confirmed", "cancelled"];
 
@@ -17,7 +20,7 @@ const STATUS_COLORS = {
   completed: { background: "#dbeafe", color: "#1e40af" },
 };
 
-const TAXI_API = "http://localhost:5000/api/taxi-bookings";
+const TAXI_API = `${API_BASE}/api/taxi-bookings`;
 
 const TAXI_STATUSES = ["pending", "confirmed", "completed", "cancelled"];
 
@@ -27,6 +30,7 @@ const TABS = [
   "destinations",
   "add",
   "add-destination",
+  "category",
   "bookings",
   "taxi",
   "view",
@@ -60,6 +64,7 @@ const emptyDestForm = {
   name: "",
   district: "",
   region: "",
+  category: "",
   image: "",
   description: "",
 };
@@ -91,23 +96,23 @@ const joinLines = (value) =>
 const countUnique = (tours, key) =>
   new Set(tours.map((tour) => tour[key]).filter(Boolean)).size;
 
+// Uploaded category images come back as "/uploads/..." paths
+const imageSrc = (path) => {
+  if (!path) return "";
+  return /^https?:\/\//i.test(path) ? path : `${API_BASE}${path}`;
+};
+
+// A destination's category can be a populated object or just an id
+const getCategoryId = (dest) =>
+  dest.category && typeof dest.category === "object"
+    ? dest.category._id
+    : dest.category || "";
+
 /* ---------- Reusable table (read-only, or with View/Edit/Delete) ---------- */
 const ToursTable = ({ tours, onView, onEdit, onDelete }) => {
   const showActions = Boolean(onView || onEdit || onDelete);
   const columns = showActions ? 9 : 8;
 
-///
-
-
-
-
-
-
-
-
-
-
-  ///
   return (
     <div className="table-container">
       <table>
@@ -187,13 +192,19 @@ const ToursTable = ({ tours, onView, onEdit, onDelete }) => {
 };
 
 /* ---------- Destinations table (same look as the tours table) ---------- */
-const DestinationsTable = ({ destinations, onDelete }) => (
+const DestinationsTable = ({
+  destinations,
+  getCategoryName,
+  onEdit,
+  onDelete,
+}) => (
   <div className="table-container">
     <table>
       <thead>
         <tr>
           <th>Image</th>
           <th>Destination</th>
+          <th>Category</th>
           <th>District</th>
           <th>Region</th>
           <th>Description</th>
@@ -204,48 +215,62 @@ const DestinationsTable = ({ destinations, onDelete }) => (
       <tbody>
         {destinations.length === 0 ? (
           <tr>
-            <td colSpan="6">No destinations found</td>
+            <td colSpan="7">No destinations found</td>
           </tr>
         ) : (
-          destinations.map((dest) => (
-            <tr key={dest._id}>
-              <td>
-                {dest.image && (
-                  <img
-                    src={dest.image}
-                    alt={dest.name}
-                    className="tour-image"
-                  />
-                )}
-              </td>
-              <td>
-                <strong>{dest.name}</strong>
-              </td>
-              <td>{dest.district}</td>
-              <td>
-                <span className="type-badge">{dest.region}</span>
-              </td>
-              <td
-                style={{
-                  maxWidth: "320px",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-                title={dest.description}
-              >
-                {dest.description}
-              </td>
-              <td className="package-buttons">
-                <button
-                  className="delete-btn"
-                  onClick={() => onDelete(dest._id)}
+          destinations.map((dest) => {
+            const categoryName = getCategoryName(dest);
+
+            return (
+              <tr key={dest._id}>
+                <td>
+                  {dest.image && (
+                    <img
+                      src={dest.image}
+                      alt={dest.name}
+                      className="tour-image"
+                    />
+                  )}
+                </td>
+                <td>
+                  <strong>{dest.name}</strong>
+                </td>
+                <td>
+                  {categoryName ? (
+                    <span className="type-badge">{categoryName}</span>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td>{dest.district}</td>
+                <td>
+                  <span className="type-badge">{dest.region}</span>
+                </td>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                  title={dest.description}
                 >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))
+                  {dest.description}
+                </td>
+                <td className="package-buttons">
+                  <button className="edit-btn" onClick={() => onEdit(dest)}>
+                    Edit
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => onDelete(dest._id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            );
+          })
         )}
       </tbody>
     </table>
@@ -275,6 +300,7 @@ const AdminDashboard = () => {
   //   ?tab=dashboard | ?tab=tours | ?tab=destinations
   //   ?tab=add | ?tab=add&edit=<id>      (tour form)
   //   ?tab=add-destination               (destination form)
+  //   ?tab=category                      (add category form + list)
   //   ?tab=view&id=<id>                  (tour details)
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
@@ -282,6 +308,8 @@ const AdminDashboard = () => {
   const editingId = searchParams.get("edit");
   const isEditing = Boolean(editingId);
   const viewingId = searchParams.get("id");
+  const editingDestId = searchParams.get("editDest");
+  const isEditingDest = Boolean(editingDestId);
 
   /* ---------- Tours state ---------- */
   const [tours, setTours] = useState([]);
@@ -301,6 +329,21 @@ const AdminDashboard = () => {
   const [destForm, setDestForm] = useState(emptyDestForm);
   const [destSaving, setDestSaving] = useState(false);
   const [destFormError, setDestFormError] = useState("");
+
+  // Category filter on the destinations list ("all" or a category id)
+  const [categoryFilter, setCategoryFilter] = useState("all");
+
+  /* ---------- Categories state ---------- */
+  const [categories, setCategories] = useState([]);
+  const [catLoading, setCatLoading] = useState(true);
+  const [catError, setCatError] = useState("");
+
+  const [catName, setCatName] = useState("");
+  const [catImageFile, setCatImageFile] = useState(null);
+  const [catPreview, setCatPreview] = useState("");
+  const [catFileKey, setCatFileKey] = useState(0); // used to clear the file input
+  const [catSaving, setCatSaving] = useState(false);
+  const [catFormError, setCatFormError] = useState("");
 
   /* ---------- Bookings state ---------- */
   const [bookings, setBookings] = useState([]);
@@ -359,6 +402,28 @@ const AdminDashboard = () => {
     }
   };
 
+  /* ---------- Data: categories ---------- */
+  const fetchCategories = async () => {
+    try {
+      setCatLoading(true);
+      setCatError("");
+
+      const response = await fetch(CATEGORY_API);
+      const data = await parseResponse(response);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to fetch categories");
+      }
+      if (!Array.isArray(data)) throw new Error("Invalid response from backend");
+
+      setCategories(data);
+    } catch (err) {
+      setCatError(err.message);
+    } finally {
+      setCatLoading(false);
+    }
+  };
+
   /* ---------- Data: bookings ---------- */
   const fetchBookings = async () => {
     try {
@@ -380,50 +445,38 @@ const AdminDashboard = () => {
   };
 
   /* ---------- Data: taxi bookings ---------- */
+  const fetchTaxiBookings = async () => {
+    try {
+      setTaxiLoading(true);
+      setTaxiError("");
 
-  
+      const response = await fetch(TAXI_BOOKINGS_API);
+      const data = await parseResponse(response);
 
-const fetchTaxiBookings = async () => {
-  try {
-    setTaxiLoading(true);
-    setTaxiError("");
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            `Server returned an unexpected response (status ${response.status})`
+        );
+      }
 
-    console.log("Fetching taxi bookings:", TAXI_BOOKINGS_API);
+      if (!Array.isArray(data)) {
+        throw new Error("Invalid response from backend");
+      }
 
-    const response = await fetch(TAXI_BOOKINGS_API);
-
-    console.log("Taxi response status:", response.status);
-    console.log("Taxi response URL:", response.url);
-
-    const data = await parseResponse(response);
-
-    console.log("Taxi bookings received:", data);
-
-    if (!response.ok) {
-      throw new Error(
-        data.message ||
-          `Server returned an unexpected response (status ${response.status})`
-      );
+      setTaxiBookings(data);
+    } catch (err) {
+      console.error("Fetch taxi bookings error:", err);
+      setTaxiError(err.message);
+    } finally {
+      setTaxiLoading(false);
     }
-
-    if (!Array.isArray(data)) {
-      throw new Error("Invalid response from backend");
-    }
-
-    setTaxiBookings(data);
-  } catch (err) {
-    console.error("Fetch taxi bookings error:", err);
-    setTaxiError(err.message);
-  } finally {
-    setTaxiLoading(false);
-  }
-};
-
-
+  };
 
   useEffect(() => {
     fetchTours();
     fetchDestinations();
+    fetchCategories();
     fetchBookings();
     fetchTaxiBookings();
   }, []);
@@ -471,17 +524,59 @@ const fetchTaxiBookings = async () => {
     });
   }, [editingId, tours]);
 
+  // Editing a destination: pre-fill the form once the destination is available
+  useEffect(() => {
+    if (!editingDestId) return;
+    const dest = destinations.find((d) => d._id === editingDestId);
+    if (!dest) return;
+
+    setDestForm({
+      name: dest.name || "",
+      district: dest.district || "",
+      region: dest.region || "",
+      category: getCategoryId(dest),
+      image: dest.image || "",
+      description: dest.description || "",
+    });
+  }, [editingDestId, destinations]);
+
+  // Release the temporary preview URL when it changes / on unmount
+  useEffect(() => {
+    return () => {
+      if (catPreview) URL.revokeObjectURL(catPreview);
+    };
+  }, [catPreview]);
+
+  // Category name for a destination (works with populated or plain ids)
+  const getCategoryName = (dest) => {
+    if (dest.category && typeof dest.category === "object") {
+      return dest.category.name || "";
+    }
+    const match = categories.find((c) => c._id === dest.category);
+    return match ? match.name : "";
+  };
+
   const filteredTours = tours.filter((tour) =>
     `${tour.title || ""} ${tour.city || ""} ${tour.region || ""} ${tour.type || ""}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
 
-  const filteredDestinations = destinations.filter((dest) =>
-    `${dest.name || ""} ${dest.district || ""} ${dest.region || ""}`
+  const filteredDestinations = destinations.filter((dest) => {
+    const matchesSearch = `${dest.name || ""} ${dest.district || ""} ${
+      dest.region || ""
+    } ${getCategoryName(dest)}`
       .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+      .includes(search.toLowerCase());
+
+    const matchesCategory =
+      categoryFilter === "all" || getCategoryId(dest) === categoryFilter;
+
+    return matchesSearch && matchesCategory;
+  });
+
+  const destCountFor = (categoryId) =>
+    destinations.filter((d) => getCategoryId(d) === categoryId).length;
 
   const filteredBookings = bookings.filter((booking) =>
     `${booking.name || ""} ${booking.email || ""} ${booking.phone || ""} ${
@@ -491,13 +586,13 @@ const fetchTaxiBookings = async () => {
       .includes(search.toLowerCase())
   );
 
-const filteredTaxiBookings = taxiBookings.filter((taxi) =>
-  `${taxi.name || ""} ${taxi.email || ""} ${taxi.phone || ""} ${
-    taxi.pickup || ""
-  } ${taxi.dropoff || ""} ${taxi.vehicle || ""} ${taxi.status || ""}`
-    .toLowerCase()
-    .includes(search.toLowerCase())
-);
+  const filteredTaxiBookings = taxiBookings.filter((taxi) =>
+    `${taxi.name || ""} ${taxi.email || ""} ${taxi.phone || ""} ${
+      taxi.pickup || ""
+    } ${taxi.dropoff || ""} ${taxi.vehicle || ""} ${taxi.status || ""}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
 
   const viewedTour = tours.find((tour) => tour._id === viewingId);
 
@@ -548,13 +643,31 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
     setDestFormError("");
   };
 
-  const goToTab = (tab, extraParams = {}) => {
-    resetForm();
-    resetDestForm();
-    setSearch("");
-    setSearchParams({ tab, ...extraParams });
+  const resetCategoryForm = () => {
+    setCatName("");
+    setCatImageFile(null);
+    setCatPreview("");
+    setCatFileKey((k) => k + 1);
+    setCatFormError("");
   };
 
+  const goToTab = (tab, extraParams = {}) => {
+  resetForm();
+  resetCategoryForm();
+
+  // Only reset destination form when NOT editing a destination
+  if (!extraParams.editDest) {
+    resetDestForm();
+  }
+
+  setSearch("");
+  setCategoryFilter("all");
+
+  setSearchParams({
+    tab,
+    ...extraParams,
+  });
+};
   const switchTab = (e, tab) => {
     e.preventDefault();
     goToTab(tab);
@@ -564,6 +677,14 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
   const openEditForm = (tour) => goToTab("add", { edit: tour._id });
   const viewTour = (tour) => goToTab("view", { id: tour._id });
   const openAddDestination = () => goToTab("add-destination");
+  const openEditDestination = (dest) =>
+    goToTab("add-destination", { editDest: dest._id });
+
+  const handleCategoryImage = (e) => {
+    const file = e.target.files?.[0] || null;
+    setCatImageFile(file);
+    setCatPreview(file ? URL.createObjectURL(file) : "");
+  };
 
   /* ---------- Save / delete: tours ---------- */
   const saveTour = async (e) => {
@@ -659,63 +780,164 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
   };
 
   /* ---------- Save / delete: destinations ---------- */
-  const saveDestination = async (e) => {
-    e.preventDefault();
-    setDestFormError("");
+ const saveDestination = async (e) => {
+  e.preventDefault();
+  setDestFormError("");
 
-    if (!destForm.name.trim() || !destForm.region.trim()) {
-      setDestFormError("Name and region are required");
+  if (!destForm.name.trim() || !destForm.region.trim()) {
+    setDestFormError("Name and region are required");
+    return;
+  }
+
+  if (isEditingDest && !editingDestId) {
+    setDestFormError("Destination ID is missing");
+    console.error("editingDestId is missing");
+    return;
+  }
+
+  const payload = {
+    name: destForm.name.trim(),
+    district: destForm.district.trim(),
+    region: destForm.region.trim(),
+    category: destForm.category || null,
+    image: destForm.image.trim(),
+    description: destForm.description.trim(),
+  };
+
+  const url = isEditingDest
+    ? `${DEST_API}/${editingDestId}`
+    : DEST_API;
+
+  const method = isEditingDest ? "PUT" : "POST";
+
+  console.log("=================================");
+  console.log("DESTINATION SAVE");
+  console.log("Mode:", isEditingDest ? "UPDATE" : "CREATE");
+  console.log("ID:", editingDestId);
+  console.log("URL:", url);
+  console.log("Method:", method);
+  console.log("Payload:", payload);
+  console.log("=================================");
+
+  try {
+    setDestSaving(true);
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await parseResponse(response);
+
+    console.log("Destination API response:", data);
+
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+          `Failed to ${isEditingDest ? "update" : "add"} destination`
+      );
+    }
+
+  
+   // UPDATE
+if (isEditingDest) {
+  if (!data.destination) {
+    throw new Error(
+      "Destination was updated but server did not return the updated destination."
+    );
+  }
+
+  // Refresh from MongoDB so the UI always shows the saved document
+  await fetchDestinations();
+
+  showSuccess("Destination updated successfully");
+}
+
+    // CREATE
+    else {
+      if (data.destination) {
+        setDestinations((previous) => [
+          data.destination,
+          ...previous,
+        ]);
+      } else {
+        await fetchDestinations();
+      }
+
+      showSuccess("Destination added successfully");
+    }
+
+    // Go back to destination list
+    goToTab("destinations");
+
+  } catch (err) {
+    console.error("Destination save error:", err);
+    setDestFormError(err.message);
+  } finally {
+    setDestSaving(false);
+  }
+};
+
+  /* ---------- Save / delete: categories ---------- */
+  const saveCategory = async (e) => {
+    e.preventDefault();
+    setCatFormError("");
+
+    if (!catName.trim()) {
+      setCatFormError("Category name is required");
       return;
     }
 
-    const payload = {
-      name: destForm.name.trim(),
-      district: destForm.district.trim(),
-      region: destForm.region.trim(),
-      image: destForm.image.trim(),
-      description: destForm.description.trim(),
-    };
+    // multipart form so the (optional) image file can be uploaded
+    const body = new FormData();
+    body.append("name", catName.trim());
+    if (catImageFile) body.append("image", catImageFile);
 
     try {
-      setDestSaving(true);
+      setCatSaving(true);
 
-      const response = await fetch(DEST_API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
+      const response = await fetch(CATEGORY_API, { method: "POST", body });
       const data = await parseResponse(response);
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to add destination");
+        throw new Error(data.message || "Failed to add category");
       }
 
-      await fetchDestinations();
-
-      goToTab("destinations");
-      showSuccess("Destination added successfully");
+      await fetchCategories();
+      resetCategoryForm();
+      showSuccess("Category added successfully");
     } catch (err) {
-      setDestFormError(err.message);
+      setCatFormError(err.message);
     } finally {
-      setDestSaving(false);
+      setCatSaving(false);
     }
   };
 
-  const deleteDestination = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this destination?"))
+  const deleteCategory = async (id) => {
+    if (
+      !window.confirm(
+        "Delete this category? Destinations using it will be left uncategorised."
+      )
+    )
       return;
 
     try {
-      const response = await fetch(`${DEST_API}/${id}`, { method: "DELETE" });
+      const response = await fetch(`${CATEGORY_API}/${id}`, {
+        method: "DELETE",
+      });
       const data = await parseResponse(response);
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to delete destination");
+        throw new Error(data.message || "Failed to delete category");
       }
 
-      setDestinations((previous) => previous.filter((d) => d._id !== id));
-      showSuccess("Destination deleted successfully");
+      setCategories((previous) => previous.filter((c) => c._id !== id));
+      if (categoryFilter === id) setCategoryFilter("all");
+      fetchDestinations();
+      showSuccess("Category deleted successfully");
     } catch (err) {
       alert(err.message);
     }
@@ -768,36 +990,32 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
 
   /* ---------- Update / delete: taxi bookings ---------- */
   const updateTaxiStatus = async (id, status) => {
-  try {
-    const response = await fetch(`${TAXI_API}/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status }),
-    });
+    try {
+      const response = await fetch(`${TAXI_API}/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
 
-    const data = await parseResponse(response);
+      const data = await parseResponse(response);
 
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to update taxi booking"
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update taxi booking");
+      }
+
+      setTaxiBookings((previous) =>
+        previous.map((t) =>
+          t._id === id ? { ...t, status: data.booking?.status || status } : t
+        )
       );
+
+      showSuccess("Taxi booking status updated");
+    } catch (err) {
+      alert(err.message);
     }
-
-    setTaxiBookings((previous) =>
-      previous.map((t) =>
-        t._id === id
-          ? { ...t, status: data.booking?.status || status }
-          : t
-      )
-    );
-
-    showSuccess("Taxi booking status updated");
-  } catch (err) {
-    alert(err.message);
-  }
-};
+  };
 
   const deleteTaxiBooking = async (id) => {
     if (!window.confirm("Are you sure you want to delete this taxi booking?"))
@@ -823,7 +1041,8 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
     dashboard: "Dashboard",
     tours: "Tour Packages",
     destinations: "Destinations",
-    "add-destination": "Add Destination",
+    "add-destination": isEditingDest ? "Edit Destination" : "Add Destination",
+    category: "Category",
     bookings: "Bookings",
     taxi: "Taxi Bookings",
     view: "Tour Details",
@@ -834,7 +1053,10 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
     dashboard: "Manage your TravelU tours",
     tours: `${tours.length} packages available`,
     destinations: `${destinations.length} destinations available`,
-    "add-destination": "Create a new destination",
+    "add-destination": isEditingDest
+      ? "Update this destination"
+      : "Create a new destination",
+    category: `${categories.length} categories available`,
     bookings: `${bookings.length} bookings received`,
     taxi: `${taxiBookings.length} taxi bookings received`,
     view: "Full information about this tour",
@@ -872,6 +1094,17 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
   const isReady = !loading && !error;
   const isDestReady = !destLoading && !destError;
 
+  // Small pill button used for the category filter
+  const chipStyle = (active) => ({
+    border: "1px solid #e5e7eb",
+    borderRadius: "999px",
+    padding: "0.35rem 0.9rem",
+    fontWeight: 600,
+    cursor: "pointer",
+    background: active ? "#2563eb" : "#fff",
+    color: active ? "#fff" : "#374151",
+  });
+
   return (
     <div className="admin-layout">
       {/* SIDEBAR */}
@@ -907,6 +1140,14 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
             onClick={(e) => switchTab(e, "destinations")}
           >
             Destinations
+          </a>
+
+          <a
+            href="#category"
+            className={activeTab === "category" ? "active" : ""}
+            onClick={(e) => switchTab(e, "category")}
+          >
+            Category
           </a>
 
           <a
@@ -969,6 +1210,11 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
               <div className="stat-card">
                 <h3>Destinations</h3>
                 <strong>{destinations.length}</strong>
+              </div>
+
+              <div className="stat-card">
+                <h3>Categories</h3>
+                <strong>{categories.length}</strong>
               </div>
 
               <div className="stat-card">
@@ -1038,11 +1284,42 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
               placeholder="Search destinations..."
             />
 
+            {/* Category filter */}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "0.5rem",
+                margin: "0.5rem 0 1rem",
+              }}
+            >
+              <button
+                type="button"
+                style={chipStyle(categoryFilter === "all")}
+                onClick={() => setCategoryFilter("all")}
+              >
+                All ({destinations.length})
+              </button>
+
+              {categories.map((cat) => (
+                <button
+                  key={cat._id}
+                  type="button"
+                  style={chipStyle(categoryFilter === cat._id)}
+                  onClick={() => setCategoryFilter(cat._id)}
+                >
+                  {cat.name} ({destCountFor(cat._id)})
+                </button>
+              ))}
+            </div>
+
             {destStatusBlocks}
 
             {isDestReady && (
               <DestinationsTable
                 destinations={filteredDestinations}
+                getCategoryName={getCategoryName}
+                onEdit={openEditDestination}
                 onDelete={deleteDestination}
               />
             )}
@@ -1066,6 +1343,28 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
                 placeholder="e.g. Munnar"
               />
             </label>
+
+            <label>
+              Category
+              <select
+                name="category"
+                value={destForm.category}
+                onChange={handleDestChange}
+              >
+                <option value="">Select a category</option>
+                {categories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {categories.length === 0 && !catLoading && (
+              <p style={{ margin: "0 0 0.8rem", color: "#6b7280" }}>
+                No categories yet. Add some from the Category tab.
+              </p>
+            )}
 
             <div className="form-row">
               <label>
@@ -1131,10 +1430,134 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
               </button>
 
               <button type="submit" className="save-btn" disabled={destSaving}>
-                {destSaving ? "Saving..." : "Add Destination"}
+                {destSaving
+                  ? "Saving..."
+                  : isEditingDest
+                  ? "Update Destination"
+                  : "Add Destination"}
               </button>
             </div>
           </form>
+        )}
+
+        {/* ================= CATEGORY ================= */}
+        {activeTab === "category" && (
+          <>
+            <form className="add-tour-form" onSubmit={saveCategory}>
+              {catFormError && (
+                <div className="error-message">{catFormError}</div>
+              )}
+
+              <label>
+                Category name *
+                <input
+                  type="text"
+                  value={catName}
+                  onChange={(e) => setCatName(e.target.value)}
+                  placeholder="e.g. Beach, City, Nature"
+                />
+              </label>
+
+              <label>
+                Category image (optional)
+                <input
+                  key={catFileKey}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCategoryImage}
+                />
+              </label>
+
+              {catPreview && (
+                <img
+                  src={catPreview}
+                  alt="Preview"
+                  className="image-preview"
+                />
+              )}
+
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={resetCategoryForm}
+                >
+                  Clear
+                </button>
+
+                <button type="submit" className="save-btn" disabled={catSaving}>
+                  {catSaving ? "Saving..." : "Add Category"}
+                </button>
+              </div>
+            </form>
+
+            <div className="tour-section" style={{ marginTop: "1.5rem" }}>
+              <div className="section-header">
+                <div>
+                  <h2>All Categories</h2>
+                  <p>Categories available when adding a destination</p>
+                </div>
+              </div>
+
+              {catLoading && <p>Loading categories...</p>}
+
+              {catError && (
+                <div className="error-message">
+                  {catError}
+                  <button onClick={fetchCategories}>Retry</button>
+                </div>
+              )}
+
+              {!catLoading && !catError && (
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Image</th>
+                        <th>Category</th>
+                        <th>Destinations</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {categories.length === 0 ? (
+                        <tr>
+                          <td colSpan="4">No categories found</td>
+                        </tr>
+                      ) : (
+                        categories.map((cat) => (
+                          <tr key={cat._id}>
+                            <td>
+                              {cat.image && (
+                                <img
+                                  src={imageSrc(cat.image)}
+                                  alt={cat.name}
+                                  className="tour-image"
+                                />
+                              )}
+                            </td>
+                            <td>
+                              <strong>{cat.name}</strong>
+                            </td>
+                            <td>{destCountFor(cat._id)}</td>
+                            <td className="package-buttons">
+                              <button
+                                className="delete-btn"
+                                onClick={() => deleteCategory(cat._id)}
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
         )}
 
         {/* ================= BOOKINGS ================= */}
@@ -1255,151 +1678,142 @@ const filteredTaxiBookings = taxiBookings.filter((taxi) =>
         )}
 
         {/* ================= TAXI BOOKINGS ================= */}
-       {/* ================= TAXI BOOKINGS ================= */}
-{activeTab === "taxi" && (
-  <div className="tour-section">
-    <SectionHeader
-      title="Taxi Bookings"
-      subtitle="Taxi rides booked by customers"
-      search={search}
-      onSearch={setSearch}
-      placeholder="Search taxi bookings..."
-    />
+        {activeTab === "taxi" && (
+          <div className="tour-section">
+            <SectionHeader
+              title="Taxi Bookings"
+              subtitle="Taxi rides booked by customers"
+              search={search}
+              onSearch={setSearch}
+              placeholder="Search taxi bookings..."
+            />
 
-    {taxiLoading && <p>Loading taxi bookings...</p>}
+            {taxiLoading && <p>Loading taxi bookings...</p>}
 
-    {taxiError && (
-      <div className="error-message">
-        {taxiError}
-        <button onClick={fetchTaxiBookings}>Retry</button>
-      </div>
-    )}
-
-    {!taxiLoading && !taxiError && (
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Booked on</th>
-              <th>Customer</th>
-              <th>Route</th>
-              <th>Pickup Date & Time</th>
-              <th>Vehicle</th>
-              <th>Passengers</th>
-              <th>Message</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredTaxiBookings.length === 0 ? (
-              <tr>
-                <td colSpan="9">No taxi bookings found</td>
-              </tr>
-            ) : (
-              filteredTaxiBookings.map((taxi) => {
-                const status = taxi.status || "Pending";
-
-                return (
-                  <tr key={taxi._id}>
-                    {/* Booked on */}
-                    <td>
-                      {taxi.createdAt
-                        ? new Date(taxi.createdAt).toLocaleDateString()
-                        : "-"}
-                    </td>
-
-                    {/* Customer */}
-                    <td>
-                      <strong>{taxi.name || "-"}</strong>
-                      <br />
-
-                      {taxi.phone || "-"}
-                      <br />
-
-                      {taxi.email || "-"}
-                    </td>
-
-                    {/* Route */}
-                    <td>
-                      <strong>{taxi.pickup || "-"}</strong>
-                      <br />
-                      → {taxi.dropoff || "-"}
-                    </td>
-
-                    {/* Date & time */}
-                    <td>
-                      {taxi.date || "-"}
-                      <br />
-                      {taxi.time || "-"}
-                    </td>
-
-                    {/* Vehicle */}
-                    <td>
-                      <span className="type-badge">
-                        {taxi.vehicle || "-"}
-                      </span>
-                    </td>
-
-                    {/* Passengers */}
-                    <td>{taxi.passengers || 1}</td>
-
-                    {/* Message */}
-                    <td>
-                      {taxi.message ? taxi.message : "-"}
-                    </td>
-
-                    {/* Status */}
-                    <td>
-                      <select
-                        value={status.toLowerCase()}
-                        onChange={(e) =>
-                          updateTaxiStatus(
-                            taxi._id,
-                            e.target.value
-                          )
-                        }
-                        style={{
-                          ...(STATUS_COLORS[
-                            status.toLowerCase()
-                          ] || STATUS_COLORS.pending),
-                          border: "none",
-                          borderRadius: "999px",
-                          padding: "0.3rem 0.7rem",
-                          fontWeight: 600,
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        {TAXI_STATUSES.map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="package-buttons">
-                      <button
-                        className="delete-btn"
-                        onClick={() =>
-                          deleteTaxiBooking(taxi._id)
-                        }
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
+            {taxiError && (
+              <div className="error-message">
+                {taxiError}
+                <button onClick={fetchTaxiBookings}>Retry</button>
+              </div>
             )}
-          </tbody>
-        </table>
-      </div>
-    )}
-  </div>
-)}
+
+            {!taxiLoading && !taxiError && (
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Booked on</th>
+                      <th>Customer</th>
+                      <th>Route</th>
+                      <th>Pickup Date & Time</th>
+                      <th>Vehicle</th>
+                      <th>Passengers</th>
+                      <th>Message</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {filteredTaxiBookings.length === 0 ? (
+                      <tr>
+                        <td colSpan="9">No taxi bookings found</td>
+                      </tr>
+                    ) : (
+                      filteredTaxiBookings.map((taxi) => {
+                        const status = taxi.status || "Pending";
+
+                        return (
+                          <tr key={taxi._id}>
+                            {/* Booked on */}
+                            <td>
+                              {taxi.createdAt
+                                ? new Date(taxi.createdAt).toLocaleDateString()
+                                : "-"}
+                            </td>
+
+                            {/* Customer */}
+                            <td>
+                              <strong>{taxi.name || "-"}</strong>
+                              <br />
+
+                              {taxi.phone || "-"}
+                              <br />
+
+                              {taxi.email || "-"}
+                            </td>
+
+                            {/* Route */}
+                            <td>
+                              <strong>{taxi.pickup || "-"}</strong>
+                              <br />→ {taxi.dropoff || "-"}
+                            </td>
+
+                            {/* Date & time */}
+                            <td>
+                              {taxi.date || "-"}
+                              <br />
+                              {taxi.time || "-"}
+                            </td>
+
+                            {/* Vehicle */}
+                            <td>
+                              <span className="type-badge">
+                                {taxi.vehicle || "-"}
+                              </span>
+                            </td>
+
+                            {/* Passengers */}
+                            <td>{taxi.passengers || 1}</td>
+
+                            {/* Message */}
+                            <td>{taxi.message ? taxi.message : "-"}</td>
+
+                            {/* Status */}
+                            <td>
+                              <select
+                                value={status.toLowerCase()}
+                                onChange={(e) =>
+                                  updateTaxiStatus(taxi._id, e.target.value)
+                                }
+                                style={{
+                                  ...(STATUS_COLORS[status.toLowerCase()] ||
+                                    STATUS_COLORS.pending),
+                                  border: "none",
+                                  borderRadius: "999px",
+                                  padding: "0.3rem 0.7rem",
+                                  fontWeight: 600,
+                                  textTransform: "capitalize",
+                                }}
+                              >
+                                {TAXI_STATUSES.map((s) => (
+                                  <option key={s} value={s}>
+                                    {s}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+
+                            {/* Actions */}
+                            <td className="package-buttons">
+                              <button
+                                className="delete-btn"
+                                onClick={() => deleteTaxiBooking(taxi._id)}
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ================= VIEW TOUR ================= */}
         {activeTab === "view" && (
           <div className="tour-section">

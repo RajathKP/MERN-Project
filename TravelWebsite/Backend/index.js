@@ -3,6 +3,7 @@ require("dotenv").config();
 const dns = require("node:dns");
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 
@@ -12,6 +13,8 @@ const tourRoutes = require("./routes/tourRoutes");
 const bookingRoutes = require("./Routes/BookingRoute");
 const destinationRoute = require("./Routes/destinationRoute");
 const taxiBookingRoutes = require("./Routes/TaxiBooking");
+const categoryRoute = require("./Routes/CategoryRoute"); // NEW
+
 
 const app = express();
 
@@ -31,6 +34,9 @@ app.use(
 );
 
 app.use(express.json());
+
+// NEW: serve uploaded images (category images) at /uploads/...
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
 // =====================================
@@ -70,6 +76,7 @@ app.get("/taxi-direct-test", (req, res) => {
 app.use("/api/tours", tourRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/destinations", destinationRoute);
+app.use("/api/categories", categoryRoute); // NEW
 app.use("/api/taxi-bookings", taxiBookingRoutes);
 
 
@@ -83,6 +90,7 @@ console.log("=================================");
 console.log("Tours:          /api/tours");
 console.log("Bookings:       /api/bookings");
 console.log("Destinations:   /api/destinations");
+console.log("Categories:     /api/categories");
 console.log("Taxi Bookings:  /api/taxi-bookings");
 console.log("=================================");
 
