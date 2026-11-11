@@ -119,68 +119,38 @@ router.post("/", async (req, res) => {
 // UPDATE DESTINATION
 // PUT /api/destinations/:id
 // =====================================================
+// PUT /api/destinations/:id  -> update a destination
 router.put("/:id", async (req, res) => {
   try {
-    console.log("PUT /api/destinations/" + req.params.id);
-    console.log("Request body:", req.body);
-
-    const {
-      name,
-      district,
-      region,
-      category,
-      image,
-      description,
-    } = req.body;
-
-    // Required fields
-    if (!name || !name.trim() || !region || !region.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Name and region are required",
-      });
+    const { name, district, region, category, image, description } = req.body;
+ 
+    if (!name || !region) {
+      return res.status(400).json({ message: "Name and region are required" });
     }
-
+ 
     const updated = await Destination.findByIdAndUpdate(
       req.params.id,
       {
-        name: name.trim(),
-        district: district ? district.trim() : "",
-        region: region.trim(),
-        category: category ? category.trim() : "",
-        image: image ? image.trim() : "",
-        description: description ? description.trim() : "",
+        name,
+        district,
+        region,
+        category: category || null,
+        image,
+        description,
       },
-      {
-        new: true,
-        runValidators: true,
-      }
+      { new: true, runValidators: true }
     );
-
+ 
     if (!updated) {
-      return res.status(404).json({
-        success: false,
-        message: "Destination not found",
-      });
+      return res.status(404).json({ message: "Destination not found" });
     }
-
-    console.log("Destination updated:", updated._id);
-
-    res.status(200).json({
-      success: true,
-      message: "Destination updated successfully",
-      destination: updated,
-    });
-  } catch (error) {
-    console.error("PUT destination error:", error);
-
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+ 
+    // same shape the frontend expects: { message, destination }
+    res.json({ message: "Destination updated", destination: updated });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
-
 // =====================================================
 // DELETE DESTINATION
 // DELETE /api/destinations/:id

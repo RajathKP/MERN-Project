@@ -481,6 +481,11 @@ const AdminDashboard = () => {
     fetchTaxiBookings();
   }, []);
 
+
+  useEffect(() => {
+  if (activeTab === "bookings") fetchBookings();
+}, [activeTab]);
+
   // Adding a tour: start with a blank form
   useEffect(() => {
     if (!editingId) {
@@ -677,9 +682,39 @@ const AdminDashboard = () => {
   const openEditForm = (tour) => goToTab("add", { edit: tour._id });
   const viewTour = (tour) => goToTab("view", { id: tour._id });
   const openAddDestination = () => goToTab("add-destination");
+
   const openEditDestination = (dest) =>
     goToTab("add-destination", { editDest: dest._id });
 
+const deleteDestination = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this destination?")) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${DEST_API}/${id}`, {
+      method: "DELETE",
+    });
+
+    const data = await parseResponse(response);
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Failed to delete destination"
+      );
+    }
+
+    // Remove deleted destination from React state
+    setDestinations((previous) =>
+      previous.filter((destination) => destination._id !== id)
+    );
+
+    showSuccess("Destination deleted successfully");
+  } catch (err) {
+    console.error("Delete destination error:", err);
+    alert(err.message);
+  }
+};
   const handleCategoryImage = (e) => {
     const file = e.target.files?.[0] || null;
     setCatImageFile(file);

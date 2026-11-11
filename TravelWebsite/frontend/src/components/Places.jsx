@@ -1,12 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import "./Places.css";
 
-const DEST_API = "http://localhost:5000/api/destinations";
-const TOURS_API = "http://localhost:5000/api/tours";
+const API_BASE = "http://localhost:5000";
+const DEST_API = `${API_BASE}/api/destinations`;
+const TOURS_API = `${API_BASE}/api/tours`;
+const CATEGORY_API = `${API_BASE}/api/categories`;
 
 const Places = () => {
   const [places, setPlaces] = useState([]);
   const [tours, setTours] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -26,6 +30,17 @@ const Places = () => {
       if (!Array.isArray(data)) throw new Error("Invalid response from backend");
 
       setPlaces(data);
+
+      // Categories are optional: used only to show the category name on cards
+      try {
+        const catResponse = await fetch(CATEGORY_API, { signal });
+        if (catResponse.ok) {
+          const catData = await catResponse.json();
+          if (Array.isArray(catData)) setCategories(catData);
+        }
+      } catch (catErr) {
+        if (catErr.name === "AbortError") throw catErr;
+      }
 
       // Tours are optional: used only to show tour count / starting price
       try {
@@ -54,6 +69,15 @@ const Places = () => {
     () => ["All", ...new Set(places.map((p) => p.region).filter(Boolean))],
     [places]
   );
+
+  // Category name for a place (works with populated or plain ids)
+  const getCategoryName = (place) => {
+    if (place.category && typeof place.category === "object") {
+      return place.category.name || "";
+    }
+    const match = categories.find((c) => c._id === place.category);
+    return match ? match.name : "";
+  };
 
   // Tours whose city matches the destination name
   const tourInfo = (place) => {
@@ -133,33 +157,47 @@ const Places = () => {
               .filter(Boolean)
               .join(", ");
             const info = tourInfo(place);
+            const categoryName = getCategoryName(place);
 
             return (
               <article className="place-card" key={place._id}>
-                <div className="place-media">
-                  {place.image && <img src={place.image} alt={place.name} />}
-                  {place.region && (
-                    <span className="place-type">{place.region}</span>
-                  )}
-                </div>
-
-                <div className="place-body">
-                  <h3>{place.name}</h3>
-                  {location && <p className="place-region">📍 {location}</p>}
-
-                  {place.description && (
-                    <p className="place-description">{place.description}</p>
-                  )}
-
-                  {info && (
-                    <div className="place-footer">
-                      <span className="place-price-label">
-                        {info.count} {info.count === 1 ? "tour" : "tours"} from
+                {/* Whole card opens the destination detail page */}
+                <Link
+                  to={`/destinations/${place._id}`}
+                  style={{
+                    display: "block",
+                    color: "inherit",
+                    textDecoration: "none",
+                  }}
+                >
+                  <div className="place-media">
+                    {place.image && <img src={place.image} alt={place.name} />}
+                    {(categoryName || place.region) && (
+                      <span className="place-type">
+                        {categoryName || place.region}
                       </span>
-                      <strong className="place-price">${info.from}</strong>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+
+                  <div className="place-body">
+                    <h3>{place.name}</h3>
+                    {location && <p className="place-region">📍 {location}</p>}
+
+                    {info && (
+                      <div className="place-footer">
+                        <span className="place-price-label">
+                          {info.count} {info.count === 1 ? "tour" : "tours"}{" "}
+                          from
+                        </span>
+                        <strong className="place-price">${info.from}</strong>
+                      </div>
+                    )}
+
+                    <p style={{ margin: "0.75rem 0 0", fontWeight: 600 }}>
+                      View details →
+                    </p>
+                  </div>
+                </Link>
               </article>
             );
           })}

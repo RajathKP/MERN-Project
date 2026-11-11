@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import DestinationsPage from "./DestinationsPage.jsx";
 import TourDetails from "./components/Tourdetails.jsx";
 import TaxiBooking from "./components/TaxiBooking.jsx";
+import Destinationdetails from "./components/Destinationdetails.jsx";
 import Places from "./components/Places.jsx";
 import {
   BrowserRouter,
@@ -409,6 +410,17 @@ export default function App() {
           path="/"
           element={<MainApp />}
         />
+
+
+
+
+
+
+
+      <Route 
+       path="/destinations/:id" 
+       element={<Destinationdetails />} />
+
 
 
         {/* TOUR DETAILS */}
