@@ -163,33 +163,5 @@
   .places-controls {
     width: 100%;
   }
-  /* Append to Places.css */
-
-.places-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0 0 1.5rem;
-}
-
-.places-chip {
-  border: 1px solid #e5e7eb;
-  border-radius: 999px;
-  padding: 0.4rem 1rem;
-  background: #fff;
-  color: #374151;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.places-chip:hover {
-  border-color: #2563eb;
-}
-
-.places-chip.active {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #fff;
-}
+  
 }
