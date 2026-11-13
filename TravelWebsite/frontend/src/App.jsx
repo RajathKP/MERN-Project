@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 
+
+
+
+  
+
 import DestinationsPage from "./DestinationsPage.jsx";
 import TourDetails from "./components/Tourdetails.jsx";
 import TaxiBooking from "./components/TaxiBooking.jsx";
 import Destinationdetails from "./components/Destinationdetails.jsx";
 import Places from "./components/Places.jsx";
 import {
-  BrowserRouter,
   Routes,
   Route,
   useNavigate,
@@ -21,9 +25,15 @@ import Footer from "./components/Footer.jsx";
 import BookingModal from "./components/BookingModal.jsx";
 import Scene from "./components/Scene.jsx";
 import { Modal } from "./components/common.jsx";
-
+import Dashboard from "./components/Dashboard.jsx";
 import { DURATIONS } from "./data.js";
-import LoginPage from "./Loginpage.jsx";
+import Login from "./components/Login.jsx";
+import Register from "./components/Register.jsx";
+import CheckoutPage from "./components/Checkoupage.jsx";
+
+
+
+
 
 const API = "http://localhost:5000/api/tours";
 
@@ -400,7 +410,7 @@ export default function App() {
 
   return (
 
-    <BrowserRouter>
+  
 
       <Routes>
 
@@ -447,16 +457,27 @@ export default function App() {
         />
 
 
-        {/* LOGIN */}
+        {/* LOGIN  AND REGISTER */}
+
+         <Route path="/login" element={<Login />} />
+         <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+
 
         <Route
           path="/login"
-          element={<LoginPage />}
+          element={<Login />}
         />
+
+
+      
+        {/* Checkout page */}
+
+        <Route path="/checkout" element={<CheckoutPage />} />
 
       </Routes>
 
-    </BrowserRouter>
+
 
   );
 }
