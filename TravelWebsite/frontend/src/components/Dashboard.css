@@ -788,3 +788,29 @@
     border-radius: 10px;
   }
 }
+
+/* overview tab actions */
+.db-ov-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.db-ov-actions .btn {
+  border-radius: 999px;
+  padding: 13px 28px;
+}
+
+.db-ov-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--coral);
+  font: 600 14px var(--body);
+}
+
+.db-ov-link:hover {
+  text-decoration: underline;
+}

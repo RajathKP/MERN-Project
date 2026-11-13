@@ -5,12 +5,15 @@ import Footer from "./Footer.jsx";
 import Scene from "./Scene.jsx";
 import BookingModal from "./BookingModal.jsx";
 import LogoutConfirm from "./LogoutConfirm.jsx";
+import OverviewCard from "./Overviewcard.jsx";
 import { Stars, ClockIcon, money } from "./common.jsx";
 import "./Dashboard.css";
 
 const API = "http://localhost:5000/api/tours";
 const BOOKINGS_API = "http://localhost:5000/api/bookings";
 const AUTH_API = "http://localhost:5000/api/auth";
+// ASSUMED endpoint for taxi bookings. Change it to match your taxi route.
+const TAXI_API = "http://localhost:5000/api/taxi-bookings";
 const PAGE_SIZE = 9;
 
 const GENDERS = ["Male", "Female", "Other", "Prefer not to say"];
@@ -33,6 +36,7 @@ const DURATIONS = [
 
 // key, title, description
 const NAV = [
+  ["overview", "Overview", "Your trips, payments and saved tours at a glance"],
   ["profile", "Profile", "Your personal details and contact info"],
   ["bookings", "My bookings", "View and track your trips"],
   ["browse", "Browse tours", "Find and book your next trip"],
@@ -41,6 +45,14 @@ const NAV = [
 const TAB_KEYS = NAV.map((n) => n[0]);
 
 const ICONS = {
+  overview: (
+    <>
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    </>
+  ),
   profile: (
     <>
       <circle cx="12" cy="8" r="4" />
@@ -133,7 +145,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const urlTab = searchParams.get("tab");
-  const tab = TAB_KEYS.includes(urlTab) ? urlTab : "profile";
+  const tab = TAB_KEYS.includes(urlTab) ? urlTab : "overview";
   const goTab = (key) => setSearchParams({ tab: key });
 
   const [user, setUser] = useState(() => readJSON("user", null));
@@ -274,13 +286,39 @@ export default function Dashboard() {
     }
   };
 
+  // load bookings on sign-in and whenever the tab changes (the overview tab needs them too)
   useEffect(() => {
-    if (tab !== "bookings") return;
+    if (!myEmail) return;
     const c = new AbortController();
     loadBookings(c.signal);
     return () => c.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab]);
+  }, [tab, myEmail]);
+
+  // taxi bookings for the overview; null means unavailable
+  const [taxiBookings, setTaxiBookings] = useState(null);
+
+  useEffect(() => {
+    if (!myEmail) return;
+    const c = new AbortController();
+    (async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${TAXI_API}?email=${encodeURIComponent(myEmail)}`, {
+          signal: c.signal,
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : Array.isArray(data.bookings) ? data.bookings : [];
+        setTaxiBookings(list.filter((t) => (t.email || "").trim().toLowerCase() === myEmail));
+      } catch (err) {
+        if (err.name !== "AbortError") setTaxiBookings(null);
+      }
+    })();
+    return () => c.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myEmail, tab]);
 
   // ------------------------------------------------ profile editing
   const [editing, setEditing] = useState(null); // "basic" | "contact" | "password" | null
@@ -488,6 +526,39 @@ export default function Dashboard() {
 
         {/* ================= main panel ================= */}
         <section className="db-panel">
+          {/* ---------------- OVERVIEW ---------------- */}
+          {tab === "overview" &&
+            (!user ? (
+              loginPrompt("Please log in to see your overview.")
+            ) : (
+              <>
+                <h1>Overview</h1>
+                <p className="db-sec-sub">A quick look at your trips and payments.</p>
+                {bLoading ? (
+                  <div className="db-state">
+                    <p>Loading your overview...</p>
+                  </div>
+                ) : bError ? (
+                  <div className="db-state">
+                    <p>{bError}</p>
+                    <button type="button" className="btn coral" onClick={() => loadBookings()}>
+                      RETRY
+                    </button>
+                  </div>
+                ) : (
+                  <OverviewCard bookings={bookings} taxiBookings={taxiBookings} savedCount={saved.length} />
+                )}
+                <div className="db-ov-actions">
+                  <button type="button" className="btn coral" onClick={() => goTab("browse")}>
+                    BROWSE TOURS
+                  </button>
+                  <button type="button" className="db-ov-link" onClick={() => goTab("bookings")}>
+                    View all bookings
+                  </button>
+                </div>
+              </>
+            ))}
+
           {/* ---------------- PROFILE ---------------- */}
           {tab === "profile" &&
             (!user ? (

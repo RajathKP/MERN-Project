@@ -1,0 +1,62 @@
+/* Traveller overview card. Uses variables from style.css where available. */
+
+.oc-card {
+  background: #fff;
+  border: 1px solid var(--line, #e8e8e8);
+  border-left: 4px solid #94a3b8;
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin-bottom: 28px;
+}
+
+.oc-card.oc-good {
+  border-left-color: #16a34a;
+}
+
+.oc-card.oc-warn {
+  border-left-color: #f59e0b;
+}
+
+.oc-eyebrow {
+  display: block;
+  font: 700 11px var(--head, system-ui);
+  color: var(--muted, #6b6b6b);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.oc-head h3 {
+  margin: 6px 0 0;
+  font: 600 18px var(--head, system-ui);
+  line-height: 1.4;
+  color: var(--ink, #111);
+}
+
+.oc-grid {
+  margin: 18px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px 24px;
+}
+
+.oc-item dt {
+  font: 600 12px var(--head, system-ui);
+  color: var(--muted, #6b6b6b);
+}
+
+.oc-item dd {
+  margin: 4px 0 0;
+  font: 700 22px var(--head, system-ui);
+  color: var(--ink, #111);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 520px) {
+  .oc-card {
+    padding: 18px;
+  }
+
+  .oc-item dd {
+    font-size: 19px;
+  }
+}
