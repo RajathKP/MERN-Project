@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
 import Scene from "./Scene.jsx";
 import BookingModal from "./BookingModal.jsx";
-import LogoutConfirm from "./LogoutConfirm.jsx";
-import OverviewCard from "./Overviewcard.jsx";
+import OverviewCard, { PastBookings } from "./Overviewcard.jsx";
 import { Stars, ClockIcon, money } from "./common.jsx";
 import "./Dashboard.css";
 
@@ -142,7 +141,6 @@ const toForm = (u) => ({
 });
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const urlTab = searchParams.get("tab");
   const tab = TAB_KEYS.includes(urlTab) ? urlTab : "overview";
@@ -412,19 +410,6 @@ export default function Dashboard() {
     }
   };
 
-  const [confirmLogout, setConfirmLogout] = useState(false);
-
-  const logout = () => {
-    setConfirmLogout(false);
-    try {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-    } catch {
-      /* storage unavailable */
-    }
-    navigate("/login");
-  };
-
   // ------------------------------------------------ pieces of UI
   const initial = (user?.name || user?.email || "?").trim().charAt(0).toUpperCase();
 
@@ -517,11 +502,6 @@ export default function Dashboard() {
             ))}
           </nav>
 
-          {user && (
-            <button type="button" className="db-logout" onClick={() => setConfirmLogout(true)}>
-              Log out
-            </button>
-          )}
         </aside>
 
         {/* ================= main panel ================= */}
@@ -556,6 +536,8 @@ export default function Dashboard() {
                     View all bookings
                   </button>
                 </div>
+
+                {!bLoading && !bError && <PastBookings bookings={bookings} />}
               </>
             ))}
 
@@ -989,9 +971,6 @@ export default function Dashboard() {
 
       {booking && <BookingModal tour={booking} onClose={() => setBooking(null)} />}
 
-      {confirmLogout && (
-        <LogoutConfirm onConfirm={logout} onCancel={() => setConfirmLogout(false)} />
-      )}
     </>
   );
 }

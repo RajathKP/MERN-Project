@@ -814,3 +814,27 @@
 .db-ov-link:hover {
   text-decoration: underline;
 }
+
+/* extra space between the dashboard and the footer */
+.db-shell {
+  padding-bottom: 130px;
+}
+
+@media (max-width: 600px) {
+  .db-shell {
+    padding-bottom: 96px;
+  }
+}
+
+/* medium, even spacing between the header and footer and the dashboard content */
+.db-shell {
+  padding-top: 56px;
+  padding-bottom: 96px;
+}
+
+@media (max-width: 600px) {
+  .db-shell {
+    padding-top: 40px;
+    padding-bottom: 72px;
+  }
+}

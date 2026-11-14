@@ -1,7 +1,9 @@
 import "./OverviewCard.css";
 
 // Personal overview for the signed-in traveller.
-// Usage: <OverviewCard bookings={bookings} taxiBookings={taxiBookings} savedCount={saved.length} />
+// Usage:
+//   <OverviewCard bookings={bookings} taxiBookings={taxiBookings} savedCount={saved.length} />
+//   <PastBookings bookings={bookings} />        // table, placed wherever you want it
 // taxiBookings: array, or null while loading / unavailable.
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -12,14 +14,24 @@ const startOfToday = () => {
 };
 
 const fmt = (n) => `₹${Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+const fmtDate = (d) => {
+  const date = new Date(d);
+  return isNaN(date) ? d || "—" : date.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+};
 const isCancelled = (b) => (b.status || "").toLowerCase() === "cancelled" || (b.status || "").toLowerCase() === "canceled";
+
+// shared: non-cancelled tour bookings whose travel date has passed, newest first
+const getPastTours = (bookings, today = startOfToday()) =>
+  bookings
+    .filter((b) => !isCancelled(b) && b.travelDate && new Date(b.travelDate) < today)
+    .sort((a, b) => new Date(b.travelDate) - new Date(a.travelDate));
 
 export default function OverviewCard({ bookings = [], taxiBookings = null, savedCount = 0 }) {
   const today = startOfToday();
 
   // ---- tours
   const tours = bookings.filter((b) => !isCancelled(b));
-  const past = tours.filter((b) => b.travelDate && new Date(b.travelDate) < today);
+  const past = getPastTours(bookings, today);
   const upcoming = tours
     .filter((b) => b.travelDate && new Date(b.travelDate) >= today)
     .sort((a, b) => new Date(a.travelDate) - new Date(b.travelDate));
@@ -90,6 +102,48 @@ export default function OverviewCard({ bookings = [], taxiBookings = null, saved
           </div>
         ))}
       </dl>
+    </section>
+  );
+}
+
+// Table of past tour bookings. Rendered separately so it can sit below the overview actions.
+export function PastBookings({ bookings = [] }) {
+  const past = getPastTours(bookings);
+
+  return (
+    <section className="oc-table-wrap" aria-labelledby="oc-past-title">
+      <h4 id="oc-past-title" className="oc-table-title">Past bookings</h4>
+      {past.length === 0 ? (
+        <p className="oc-empty">No past bookings yet. Your completed trips will appear here.</p>
+      ) : (
+        <table className="oc-table">
+          <thead>
+            <tr>
+              <th scope="col">Tour</th>
+              <th scope="col">Travel date</th>
+              <th scope="col" className="num">Guests</th>
+              <th scope="col" className="num">Amount</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {past.map((b) => {
+              const status = (b.status || "completed").toLowerCase();
+              return (
+                <tr key={b._id || `${b.tourTitle}-${b.travelDate}`}>
+                  <td data-label="Tour">{b.tourTitle || "Tour"}</td>
+                  <td data-label="Travel date">{fmtDate(b.travelDate)}</td>
+                  <td data-label="Guests" className="num">{b.guests || 1}</td>
+                  <td data-label="Amount" className="num">{fmt(b.totalPrice)}</td>
+                  <td data-label="Status">
+                    <span className={`oc-status ${status}`}>{status}</span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
     </section>
   );
 }
