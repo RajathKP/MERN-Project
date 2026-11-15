@@ -30,6 +30,7 @@ import { DURATIONS } from "./data.js";
 import Login from "./components/Login.jsx";
 import Register from "./components/Register.jsx";
 import CheckoutPage from "./components/Checkoupage.jsx";
+import Contact from "./components/Contact.jsx";
 
 
 
@@ -468,6 +469,11 @@ export default function App() {
           path="/login"
           element={<Login />}
         />
+
+      {/* Contact page*/ }
+
+
+        <Route path="/contact" element={<Contact />} />
 
 
       

@@ -30,7 +30,7 @@ const LINKS = [
   ["Listings", "/#tours"],
   ["Taxi Booking", "/taxi"],
   ["Popular", "/#popular"],
-  ["Contact", "/#contact"]
+  ["Contact", "/contact"]
 ];
 
 // ----------------------------------------------------
