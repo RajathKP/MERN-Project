@@ -1,0 +1,77 @@
+.pm {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.pm-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+  background: #fff;
+  color: #222;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.pm-btn:hover,
+.pm-btn[aria-expanded='true'] {
+  background: #f1f3f6;
+}
+
+.pm-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 150px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  padding: 6px;
+  z-index: 100;
+}
+
+.pm-menu a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 6px;
+  color: #222;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.pm-menu a:hover,
+.pm-menu a.active {
+  background: #f1f3f6;
+}
+
+.pm-hello {
+  margin: 0;
+  padding: 8px 14px 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #777;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 4px;
+}
+
+.pm-logout {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #c93a30;
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.pm-logout:hover {
+  background: #fdecea;
+}

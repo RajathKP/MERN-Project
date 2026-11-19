@@ -1,0 +1,161 @@
+.taxi-page {
+  min-height: 70vh;
+  padding: 3rem 1.5rem 4rem;
+  background: #f9fafb;
+  display: flex;
+  justify-content: center;
+}
+
+.taxi-card {
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  align-self: flex-start;
+}
+
+.taxi-card h1 {
+  margin: 0 0 0.3rem;
+  font-size: 2rem;
+}
+
+.taxi-sub {
+  margin: 0 0 1.5rem;
+  color: #6b7280;
+}
+
+.taxi-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.taxi-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.taxi-form input,
+.taxi-form select,
+.taxi-form textarea {
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  font-weight: 400;
+  background: #fff;
+}
+
+.taxi-form input:focus,
+.taxi-form select:focus,
+.taxi-form textarea:focus {
+  outline: none;
+  border-color: #ef4a23;
+  box-shadow: 0 0 0 3px rgba(239, 74, 35, 0.15);
+}
+
+.taxi-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.taxi-trip-type {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.taxi-trip-type > span {
+  font-weight: 600;
+  color: #374151;
+}
+
+.taxi-form .taxi-trip-type label {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 400;
+}
+
+.taxi-form .taxi-trip-type input {
+  padding: 0;
+}
+
+.taxi-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.9rem 1.6rem;
+  background: #ef4a23;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.taxi-btn:hover {
+  background: #d63d18;
+}
+
+.taxi-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.taxi-btn-light {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.taxi-btn-light:hover {
+  background: #e5e7eb;
+}
+
+.taxi-error {
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 0.9rem;
+}
+
+.taxi-success {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.taxi-success h2 {
+  margin: 0 0 0.6rem;
+}
+
+.taxi-success p {
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.taxi-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+@media (max-width: 600px) {
+  .taxi-row {
+    grid-template-columns: 1fr;
+  }
+
+  .taxi-trip-type {
+    flex-wrap: wrap;
+  }
+}

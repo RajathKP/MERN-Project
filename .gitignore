@@ -1,0 +1,20 @@
+node_modules/
+**/node_modules/
+
+.env
+**/.env
+.env.*
+**/.env.*
+
+dist/
+**/dist/
+
+build/
+**/build/
+
+.vscode/
+
+.vite/
+**/.vite/
+
+frontend/AFRICA   Cinematic Video.mp4

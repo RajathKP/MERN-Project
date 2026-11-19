@@ -1,0 +1,302 @@
+.dd-page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+  color: #111827;
+}
+
+.dd-back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: #2563eb;
+}
+
+.dd-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.9rem;
+  font-weight: 700;
+}
+
+.dd-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.dd-badge {
+  display: inline-block;
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Two columns: content left, sticky price card right */
+.dd-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.dd-hero {
+  height: 340px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #e5e7eb;
+}
+
+.dd-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.dd-main h2 {
+  margin: 2rem 0 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.dd-description {
+  margin: 0;
+  line-height: 1.75;
+  color: #374151;
+  white-space: pre-line;
+}
+
+/* Activities */
+.dd-activities {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.dd-activities li {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+/* Itinerary accordion */
+.dd-note {
+  margin: -0.4rem 0 0.75rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.dd-itinerary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dd-day {
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.dd-day-head {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dd-chevron {
+  transition: transform 0.2s;
+}
+
+.dd-day.open .dd-chevron {
+  transform: rotate(180deg);
+}
+
+.dd-day-body {
+  margin: 0;
+  padding: 0 1.25rem 1.1rem;
+  line-height: 1.7;
+  color: #4b5563;
+  font-size: 0.9rem;
+  white-space: pre-line;
+}
+
+/* Price card */
+.dd-side {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.dd-price-card {
+  padding: 1.1rem;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.dd-price-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dd-muted {
+  font-size: 0.75rem;
+  color: #6b7280;
+  max-width: 90px;
+}
+
+.dd-price-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.dd-price-col s {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.dd-price-col strong {
+  font-size: 1.15rem;
+}
+
+.dd-duration {
+  margin: 0.75rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.dd-included-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.dd-included {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.dd-included div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.dd-included small {
+  font-size: 0.65rem;
+  color: #6b7280;
+}
+
+.dd-cta {
+  width: 100%;
+  padding: 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: #ea3a14;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.dd-cta:hover {
+  background: #c9300e;
+}
+
+/* Tour packages */
+.dd-tours {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1.25rem;
+}
+
+.dd-tour {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.dd-tour img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+
+.dd-tour-body {
+  padding: 0.9rem;
+}
+
+.dd-tour-body h3 {
+  margin: 0.4rem 0 0.2rem;
+  font-size: 1rem;
+}
+
+.dd-tour-body p {
+  margin: 0 0 0.4rem;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.dd-status {
+  color: #6b7280;
+}
+
+.dd-error {
+  padding: 1rem;
+  border-radius: 10px;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.dd-error button {
+  margin-left: 0.75rem;
+}
+
+@media (max-width: 800px) {
+  .dd-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dd-side {
+    position: static;
+    order: -1;
+  }
+
+  .dd-hero {
+    height: 230px;
+  }
+}

@@ -1,0 +1,840 @@
+/* Dashboard (account page layout). Relies on variables from style.css:
+   --coral, --coral-d, --dark, --line, --muted, --head, --body */
+
+/* dark strip so the fixed, white-text header is readable at the top */
+.db-topbar {
+  height: 76px;
+  background: var(--dark);
+}
+
+.db-shell {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 0 40px;
+  align-items: start;
+  padding-top: 32px;
+  padding-bottom: 90px;
+  min-height: 70vh;
+}
+
+/* ============ sidebar ============ */
+.db-side {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.db-sum {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px 20px;
+  text-align: center;
+  background: #fff;
+}
+
+.db-avatar {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--coral);
+  color: #fff;
+  font: 700 26px var(--head);
+  display: grid;
+  place-items: center;
+}
+
+.db-sum h3 {
+  font-size: 17px;
+}
+
+.db-sum p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.db-pill {
+  margin-top: 16px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--coral);
+  color: #fff;
+  font: 600 12px var(--head);
+}
+
+.db-pill:hover {
+  background: var(--coral-d);
+}
+
+.db-sum-btn {
+  margin-top: 16px;
+  border-radius: 999px;
+}
+
+.db-prompt {
+  background: #eef1f6;
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.db-prompt h4 {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.db-prompt p {
+  margin: 0 0 14px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.db-prompt .btn {
+  border-radius: 999px;
+  padding: 10px 24px;
+}
+
+.db-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.db-nav button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  text-align: left;
+  color: var(--ink);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.db-nav button:hover {
+  border-color: #bbb;
+}
+
+.db-nav button.on {
+  border-color: var(--coral);
+  background: #fff6f3;
+}
+
+.db-nav-ic {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.db-nav-t {
+  flex: 1;
+  min-width: 0;
+}
+
+.db-nav-t b {
+  display: block;
+  font: 600 15px var(--head);
+}
+
+.db-nav-t small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.db-nav svg:last-child {
+  flex-shrink: 0;
+  color: #666;
+}
+
+.db-logout {
+  padding: 13px;
+  border: 1px solid #c93a30;
+  border-radius: 12px;
+  background: #fff;
+  color: #c93a30;
+  font: 600 12px var(--head);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.db-logout:hover {
+  background: #c93a30;
+  color: #fff;
+}
+
+/* ============ main panel ============ */
+.db-panel {
+  min-width: 0;
+  padding-left: 40px;
+  border-left: 1px solid var(--line);
+}
+
+.db-panel h1 {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+
+.db-sec {
+  margin-top: 40px;
+}
+
+.db-sec-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.db-sec-head h2 {
+  font-size: 26px;
+}
+
+.db-edit {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--coral);
+  font: 600 14px var(--body);
+}
+
+.db-edit:hover {
+  color: var(--coral-d);
+  text-decoration: underline;
+}
+
+.db-sec-sub {
+  margin: 6px 0 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+}
+
+/* read-only fields */
+.db-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px 40px;
+}
+
+.db-field span {
+  font: 600 14px var(--head);
+}
+
+.db-field p {
+  margin: 6px 0 0;
+  font-size: 16px;
+  color: #333;
+  word-break: break-word;
+}
+
+.db-field p.db-na {
+  color: #666;
+}
+
+/* edit forms */
+.db-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+
+.db-form .full {
+  grid-column: 1 / -1;
+}
+
+.db-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font: 600 13px var(--head);
+}
+
+.db-form input,
+.db-form select,
+.db-form textarea {
+  border: 1px solid #cfd3da;
+  border-radius: 8px;
+  padding: 11px 12px;
+  background: #fff;
+  font: 400 14px var(--body);
+}
+
+.db-form input:focus,
+.db-form select:focus,
+.db-form textarea:focus {
+  outline: 2px solid var(--coral);
+  outline-offset: -1px;
+}
+
+.db-form input:disabled {
+  background: #f5f5f5;
+  color: #888;
+}
+
+.db-form label small {
+  font: 400 11px var(--body);
+  color: var(--muted);
+}
+
+.db-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.db-actions-row .btn {
+  border-radius: 999px;
+  padding: 13px 30px;
+}
+
+.db-actions-row .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.db-cancel {
+  background: none;
+  border: 0;
+  color: #555;
+  font: 600 14px var(--body);
+}
+
+.db-cancel:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.db-msg {
+  margin: 14px 0 0;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.db-form .db-msg {
+  margin: 0;
+}
+
+.db-msg.ok {
+  background: #d9f7e5;
+  color: #146c3b;
+}
+
+.db-msg.err {
+  background: #fde4e1;
+  color: #a1352a;
+}
+
+/* ============ shared states ============ */
+.db-state {
+  text-align: center;
+  padding: 50px 0;
+  color: var(--muted);
+}
+
+.db-state .btn {
+  margin-top: 8px;
+}
+
+/* ============ browse / saved ============ */
+.db-search {
+  width: 100%;
+  height: 48px;
+  border: 1px solid #cfd3da;
+  border-radius: 10px;
+  padding: 0 16px;
+  font: 400 15px var(--body);
+}
+
+.db-search:focus {
+  outline: 2px solid var(--coral);
+  outline-offset: -1px;
+}
+
+.db-filterbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin: 14px 0 28px;
+}
+
+.db-filterbar select {
+  height: 42px;
+  border: 1px solid #cfd3da;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 10px;
+  font: 400 13px var(--body);
+}
+
+.db-range {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font: 600 12px var(--head);
+}
+
+.db-range input {
+  width: 100%;
+  accent-color: var(--coral);
+}
+
+.db-clear {
+  margin: 0 0 10px;
+  text-align: left;
+}
+
+.db-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 26px 22px;
+}
+
+.db-card {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+
+.db-card:hover {
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+}
+
+.db-img {
+  position: relative;
+  display: block;
+  aspect-ratio: 290 / 200;
+  overflow: hidden;
+}
+
+.db-img .scene {
+  transition: transform 0.6s;
+}
+
+.db-card:hover .db-img .scene {
+  transform: scale(1.06);
+}
+
+.db-heart {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #555;
+  font-size: 20px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.db-heart.on {
+  color: #e0245e;
+}
+
+.db-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.db-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.db-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.db-chip {
+  background: #fff1ee;
+  color: var(--coral-d);
+  padding: 3px 9px;
+  border-radius: 4px;
+  font: 600 10px var(--head);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.db-body h3 {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.db-body h3 a:hover {
+  color: var(--coral);
+}
+
+.db-region {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.db-foot {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.db-price {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.db-price s {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.db-price b {
+  color: var(--coral);
+  font: 700 18px var(--head);
+}
+
+.db-price small {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.db-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.db-ghost {
+  font: 600 11px var(--head);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.db-ghost:hover {
+  color: var(--coral);
+}
+
+.db-book {
+  padding: 10px 16px;
+  border-radius: 6px;
+}
+
+.db-skel {
+  aspect-ratio: 290 / 330;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: db-shimmer 1.2s infinite;
+}
+
+@keyframes db-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.db-more {
+  margin-top: 36px;
+}
+
+/* ============ my bookings ============ */
+.db-blist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.db-bitem {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.db-bmain h3 {
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.db-bmain h3 a:hover {
+  color: var(--coral);
+}
+
+.db-bmain p {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: #444;
+}
+
+.db-bmain small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.db-bnotes {
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.db-bside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.db-bside b {
+  font: 700 18px var(--head);
+  color: var(--coral);
+}
+
+.db-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font: 600 10px var(--head);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #fff4d6;
+  color: #8a6100;
+}
+
+.db-status.confirmed,
+.db-status.paid,
+.db-status.completed {
+  background: #d9f7e5;
+  color: #146c3b;
+}
+
+.db-status.cancelled,
+.db-status.canceled,
+.db-status.rejected {
+  background: #fde4e1;
+  color: #a1352a;
+}
+
+/* ============ responsive ============ */
+@media (max-width: 900px) {
+  .db-shell {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .db-side {
+    position: static;
+  }
+
+  .db-panel {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .db-fields,
+  .db-form {
+    grid-template-columns: 1fr;
+  }
+
+  .db-panel h1 {
+    font-size: 26px;
+  }
+
+  .db-sec-head h2 {
+    font-size: 22px;
+  }
+
+  .db-bitem {
+    flex-direction: column;
+  }
+
+  .db-bside {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* ============ UI polish pass ============ */
+
+/* consistent focus rings for keyboard users */
+.db-nav button:focus-visible,
+.db-pill:focus-visible,
+.db-edit:focus-visible,
+.db-heart:focus-visible,
+.db-logout:focus-visible,
+.db-cancel:focus-visible,
+.db-clear:focus-visible,
+.db-form input:focus-visible,
+.db-form select:focus-visible,
+.db-form textarea:focus-visible,
+.db-filterbar select:focus-visible,
+.db-search:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+/* smoother, consistent hover/active feedback */
+.db-nav button,
+.db-card,
+.db-book,
+.db-logout,
+.db-pill,
+.db-actions-row .btn {
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.25s, transform 0.2s;
+}
+
+.db-nav button:active,
+.db-book:active,
+.db-actions-row .btn:active {
+  transform: scale(0.98);
+}
+
+/* numbers line up in prices, counts and totals */
+.db-price b,
+.db-bside b,
+.db-range b {
+  font-variant-numeric: tabular-nums;
+}
+
+/* card images never shift layout while they load */
+.db-img,
+.db-card .scene {
+  background: #f1f3f6;
+}
+
+/* stop the card hover lift for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .db-card,
+  .db-card:hover,
+  .db-img .scene,
+  .db-card:hover .db-img .scene,
+  .db-nav button:active,
+  .db-book:active {
+    transform: none;
+    transition: none;
+  }
+  .db-skel {
+    animation: none;
+  }
+}
+
+/* tighter, easier-to-scan sections on small screens */
+@media (max-width: 600px) {
+  .db-sec {
+    margin-top: 32px;
+  }
+
+  .db-sec-head h2 {
+    font-size: 20px;
+  }
+
+  .db-form {
+    gap: 14px;
+  }
+
+  .db-actions-row .btn {
+    flex: 1;
+  }
+
+  .db-filterbar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .db-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .db-card {
+    border-radius: 10px;
+  }
+}
+
+/* overview tab actions */
+.db-ov-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.db-ov-actions .btn {
+  border-radius: 999px;
+  padding: 13px 28px;
+}
+
+.db-ov-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--coral);
+  font: 600 14px var(--body);
+}
+
+.db-ov-link:hover {
+  text-decoration: underline;
+}
+
+/* extra space between the dashboard and the footer */
+.db-shell {
+  padding-bottom: 130px;
+}
+
+@media (max-width: 600px) {
+  .db-shell {
+    padding-bottom: 96px;
+  }
+}
+
+/* medium, even spacing between the header and footer and the dashboard content */
+.db-shell {
+  padding-top: 56px;
+  padding-bottom: 96px;
+}
+
+@media (max-width: 600px) {
+  .db-shell {
+    padding-top: 40px;
+    padding-bottom: 72px;
+  }
+}
