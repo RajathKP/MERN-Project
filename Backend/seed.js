@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Tour = require("./models/TourModel");
+const Tour = require("./Models/TourModel");
 const tours = require("./data");
 
 console.log("Starting seed...");

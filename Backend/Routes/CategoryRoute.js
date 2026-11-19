@@ -5,7 +5,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const Category = require("../models/Category");
+const Category = require("../Models/Category");
 const Destination = require("../Models/Destination"); // adjust if your path differs
 
 const router = express.Router();
