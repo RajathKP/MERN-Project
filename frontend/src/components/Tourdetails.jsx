@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
 import BookingModal from "./BookingModal.jsx";
-import "./TourDetails.css";
+import "./Tourdetails.css";
 
 const API = "https://mern-project-htye.onrender.com/api/tours";
 
