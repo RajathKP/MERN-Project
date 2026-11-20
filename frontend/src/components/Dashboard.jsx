@@ -8,11 +8,11 @@ import OverviewCard, { PastBookings } from "./Overviewcard.jsx";
 import { Stars, ClockIcon, money } from "./common.jsx";
 import "./Dashboard.css";
 
-const API = "http://localhost:6001/api/tours";
-const BOOKINGS_API = "http://localhost:6001/api/bookings";
-const AUTH_API = "http://localhost:6001/api/auth";
+const API = "https://mern-project-htye.onrender.com/api/tours";
+const AUTH_API = "https://mern-project-htye.onrender.com/api/auth";
+const BOOKINGS_API = "https://mern-project-htye.onrender.com/api/bookings";
 // ASSUMED endpoint for taxi bookings. Change it to match your taxi route.
-const TAXI_API = "http://localhost:6001/api/taxi-bookings";
+const TAXI_API = "https://mern-project-htye.onrender.com/api/taxi-bookings";
 const PAGE_SIZE = 9;
 
 const GENDERS = ["Male", "Female", "Other", "Prefer not to say"];

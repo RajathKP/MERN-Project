@@ -3,10 +3,10 @@ import { Link, useParams } from "react-router-dom";
 import BookingModal from "./BookingModal.jsx"; // adjust the path to your existing modal
 import "./Destinationdetails.css";
 
-const API_BASE = "http://localhost:6001";
-const DEST_API = `${API_BASE}/api/destinations`;
-const TOURS_API = `${API_BASE}/api/tours`;
-const CATEGORY_API = `${API_BASE}/api/categories`;
+const API_BASE = "https://mern-project-htye.onrender.com";
+const DEST_API = `https://mern-project-htye.onrender.com/api/destinations`;
+const TOURS_API = `https://mern-project-htye.onrender.com/api/tours`;
+const CATEGORY_API = `https://mern-project-htye.onrender.com/api/categories`;
 const CURRENCY = "$"; // change to "₹" if your prices are in rupees
 
 const money = (n) => `${CURRENCY}${Number(n || 0).toLocaleString()}`;

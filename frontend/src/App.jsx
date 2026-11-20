@@ -30,7 +30,7 @@ import Contact from "./components/Contact.jsx";
 
 
 
-const API = "http://localhost:6000/api/tours";
+const API = "https://mern-project-htye.onrender.com/tours";
 
 const EMPTY = {
   region: "",

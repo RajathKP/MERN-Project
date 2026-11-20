@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Scene from './Scene.jsx'
 import { Modal, Stars, money } from './common.jsx'
 
-const BOOKINGS_API = 'http://localhost:6001/api/bookings'
+const BOOKINGS_API = 'https://mern-project-htye.onrender.com/api/bookings'
 
 export default function BookingModal({ tour, onClose }) {
   const [f, setF] = useState({ name: '', email: '', phone: '', date: '', guests: 2, notes: '' })

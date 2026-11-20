@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Places.css";
 
-const API_BASE = "http://localhost:6001";
+const API_BASE = "https://mern-project-htye.onrender.com";
 const DEST_API = `${API_BASE}/api/destinations`;
 const TOURS_API = `${API_BASE}/api/tours`;
 const CATEGORY_API = `${API_BASE}/api/categories`;

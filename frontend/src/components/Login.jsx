@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
 
-const AUTH_API = "http://localhost:6001/api/auth";
+const AUTH_API = "https://mern-project-htye.onrender.com/api/auth"
 
 export default function Login() {
   const navigate = useNavigate();

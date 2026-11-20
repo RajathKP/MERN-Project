@@ -4,7 +4,7 @@ import Scene from './Scene.jsx'
 import { Carousel, SectionTitle, Wave } from './common.jsx'
 import { Link } from 'react-router-dom'
 
-const API = "http://localhost:6001/api/tours"
+const API = "https://mern-project-htye.onrender.com/tours"
 
 // ----------------------------------------------------
 // OUR DESTINATIONS

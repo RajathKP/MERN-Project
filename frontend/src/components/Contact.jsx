@@ -4,7 +4,7 @@ import Footer from "./Footer.jsx";
 import "./Contact.css";
 
 // ASSUMED endpoint for contact messages. Change it to match your backend route.
-const CONTACT_API = "http://localhost:6001/api/contact";
+const CONTACT_API = "https://mern-project-htye.onrender.com/contact";
 
 const EMPTY = { name: "", email: "", phone: "", subject: "", message: "" };
 

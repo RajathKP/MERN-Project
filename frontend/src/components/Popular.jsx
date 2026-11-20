@@ -4,7 +4,7 @@ import Scene from "./Scene.jsx";
 import { Carousel, Stars, ClockIcon, money } from "./common.jsx";
 import { OurDestinations } from "./Destinations.jsx";
 
-const API = "http://localhost:6001/api/tours";
+const API = "https://mern-project-htye.onrender.com/api/tours";
 
 export default function Popular({ onPick }) {
   const navigate = useNavigate();

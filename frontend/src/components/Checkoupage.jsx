@@ -6,7 +6,7 @@ import Scene from "./Scene.jsx";
 
 import "./CheckoutPage.css";
 
-const BOOKINGS_API = "http://localhost:6001/api/bookings";
+const BOOKINGS_API = "https://mern-project-htye.onrender.com/api/bookings";
 
 const inr = (n) =>
   `₹${Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;

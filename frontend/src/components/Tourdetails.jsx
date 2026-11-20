@@ -6,7 +6,7 @@ import Footer from "./Footer.jsx";
 import BookingModal from "./BookingModal.jsx";
 import "./TourDetails.css";
 
-const API = "http://localhost:6001/api/tours";
+const API = "https://mern-project-htye.onrender.com/api/tours";
 
 /* Convert array or newline-separated text into an array */
 const toList = (value) => {
