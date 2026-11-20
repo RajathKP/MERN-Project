@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import './ProfileMenu.css'
+import './profilemenu.css'
 import LogoutConfirm from './LogoutConfirm.jsx'
 
 const readUser = () => {
