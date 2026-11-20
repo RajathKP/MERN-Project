@@ -4,7 +4,7 @@ import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
 import Scene from "./Scene.jsx";
 
-import "./CheckoutPage.css";
+import "./Checkoutpage.css";
 
 const BOOKINGS_API = "https://mern-project-htye.onrender.com/api/bookings";
 
