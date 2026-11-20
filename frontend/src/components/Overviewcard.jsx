@@ -1,4 +1,4 @@
-import "./OverviewCard.css";
+import "./Overviewcard.css";
 
 // Personal overview for the signed-in traveller.
 // Usage:
