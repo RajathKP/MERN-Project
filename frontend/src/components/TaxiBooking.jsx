@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
-import { createTaxiBooking } from "../taxiApi.js";
+import { createTaxiBooking } from "../TaxiApi.js";
 
 import "./TaxiBooking.css";
 
