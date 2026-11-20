@@ -7,7 +7,7 @@ import Scene from "./components/Scene.jsx";
 import { SectionTitle } from "./components/common.jsx";
 import "./DestinationsPage.css";
 
-const API = "https://mern-project-htye.onrender.com/api/tours";
+const API = "https://mern-project-htye.onrender.com/api/destinations";
 
 const nameOf = t => t.city || t.name || t.title || "";
 
