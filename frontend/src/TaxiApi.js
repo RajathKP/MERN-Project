@@ -1,4 +1,4 @@
-const TAXI_API = "http://localhost:6001/api/taxi-bookings";
+const TAXI_API = "https://mern-project-htye.onrender.com/api/taxi-bookings";
 
 export async function createTaxiBooking({
   name,

@@ -64,7 +64,7 @@ const Social = ({ d }) => (
 
 const USER_KEY = "user";
 const TOKEN_KEY = "token";
-const API = "http://localhost:6001"; // backend port; must match API_BASE in AdminDashboard.jsx
+const API = "https://mern-project-htye.onrender.com"; // backend port; must match API_BASE in AdminDashboard.jsx
 const BOOKINGS_URL = `${API}/api/bookings/my`; // not used yet: bookings have no per-user endpoint
 
 const readUser = () => {
